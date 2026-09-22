@@ -1,6 +1,6 @@
 # Windows 安装器构建与验收
 
-应用本体仍是 v1.4.1；安装器将已验证的便携包封装为可安装、可卸载的 EXE。不是把所有模型压进程序，也没有添加付费授权/账号注册服务。
+当前应用版本为 v1.4.5；安装器将已验证的便携包封装为可安装、可卸载的 EXE。基础包不含模型权重；历史检测档案通过独立 ZIP 导入，升级保留原有档案。
 
 ## 构建
 
@@ -16,12 +16,12 @@
 
 构建器必须读取原始 ZIP，不能递归复制已运行过的软件目录。ZIP 必须单根目录，且每个文件均在 `release-manifest.json` 中声明；逐项验证 SHA-256 和大小，拒绝额外文件、路径越界、重复路径及业务/推理/密钥/权重数据。安装清单由通过校验的文件逐项生成，不用通配符抓取工作目录。
 
-`SiteSafe.iss` 的 AppId 是稳定产品标识，后续升级不得随意更改。默认安装到当前用户 `%LOCALAPPDATA%\Programs\SiteSafe-Sentinel`；应用当前仍在安装目录存放工作空间，因此不默认 Program Files，不全局修改 PATH。
+`SiteSafe.iss` 的 AppId 是稳定产品标识，后续升级不得随意更改。默认安装到当前用户 `%LOCALAPPDATA%\Programs\SmartRoad-Inspection`；应用当前仍在安装目录存放工作空间，因此不默认 Program Files，不全局修改 PATH。
 
 ## 数据保留契约
 
-- `desktop-settings.json`、检测后端 `configs/`、规范种子 `knowledge_base/`：首次安装写入，重装不覆盖，卸载不删除。
-- 运行生成的 `runtime/`、`app_data/`、`outputs/`、用户 `.env` 及自行准备的 `models/`、`env/`、`third_party/`：不属于程序文件清单，卸载不递归清空。
+- `desktop-settings.json` 和检测后端个人配置：首次安装写入，重装不覆盖，卸载不删除。道路工作流模板 `road_demo.yaml`、`road_offline.yaml`、`road_standard.yaml`、`road_risk_operators.yaml` 随程序更新。
+- 运行生成的 `runtime/`、`road_app_data/`、`road_knowledge_base/`、`outputs/`（含已归档图片）、用户 `.env` 及自行准备的模型和环境：不属于程序文件清单，卸载不递归清空。
 - 程序代码、静态前端和基础 Python：随版本更新，由安装器卸载。
 - `sitesafe-install.ini`：保留用于辨认可重装的资料目录，不作为联网标识。
 

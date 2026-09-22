@@ -1,6 +1,6 @@
 param(
     [string]$Destination = 'E:\work\智慧交通\软件包',
-    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.4.4_road'
+    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.4.5_road'
 )
 $ErrorActionPreference = 'Stop'
 $appSource = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -47,6 +47,10 @@ Copy-Tree 'detectmodel\Site_Safety_OpenRisk'
 Copy-Tree 'desktop'
 Copy-Tree 'requirements'
 Copy-Tree 'docs'
+$historyGuide = Join-Path $appSource '..\..\docs\DETECTION_HISTORY.md'
+if (Test-Path -LiteralPath $historyGuide) {
+    Copy-Item -LiteralPath $historyGuide -Destination (Join-Path $releaseRoot 'docs\DETECTION_HISTORY.md')
+}
 foreach ($file in @('requirements.txt','LICENSE','THIRD_PARTY_NOTICE.md','COMPETITION_SUBMISSION_NOTICE.md','部署助手.bat','start-local-qwen.bat','stop-platform.bat')) {
     $path = Join-Path $appSource $file
     if (-not (Test-Path -LiteralPath $path) -and $file -in @('LICENSE','THIRD_PARTY_NOTICE.md','COMPETITION_SUBMISSION_NOTICE.md')) {

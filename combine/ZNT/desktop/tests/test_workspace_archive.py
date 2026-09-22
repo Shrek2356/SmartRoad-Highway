@@ -68,6 +68,28 @@ def test_existing_archive_is_never_overwritten_and_pending_can_be_cancelled(tmp_
     assert not (tmp_path/'new.zip').exists()
 
 
+def test_archived_evidence_keeps_original_bytes_and_hashes_after_migration(tmp_path):
+    import hashlib
+    source = tmp_path/'source'; backend = workspace(source)
+    folder = backend/'outputs/road_bridge_jobs/JOB-1'
+    original = json.dumps({'image_path':str(folder/'overlay.png')}).encode()
+    (folder/'result.json').write_bytes(original)
+    provenance = {'original_pipeline':{'output_dir':str(folder)},
+                  'files':[{'name':'result.json','sha256':hashlib.sha256(original).hexdigest()}]}
+    (folder/'bridge_summary.json').write_text(json.dumps({
+        'status':'done','source':'archive','archived':True,'output_dir':str(folder),'archive':provenance}),encoding='utf-8')
+    archive = tmp_path/'snapshot.zip'; export_workspace(source,archive)
+    target = tmp_path/'target'; target_backend = workspace(target,'existing')
+    manager = WorkspaceMaintenance(target); manager.schedule('restore',archive)
+    assert manager.run(lambda:None)['status'] == 'restored'
+    restored = target_backend/'outputs/road_bridge_jobs/JOB-1'
+    assert (restored/'result.json').read_bytes() == original
+    job = json.loads((restored/'bridge_summary.json').read_text(encoding='utf-8'))
+    assert job['archived'] and job['status'] == 'done'
+    assert Path(job['output_dir']) == restored
+    assert job['archive'] == provenance
+
+
 def test_busy_services_abort_without_modifying_workspace(tmp_path):
     root=tmp_path/'source';backend=workspace(root)
     manager=WorkspaceMaintenance(root);archive=tmp_path/'new.zip'

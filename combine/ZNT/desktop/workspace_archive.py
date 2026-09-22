@@ -29,9 +29,12 @@ FORMAT = 'sitesafe-workspace-v1'
 
 def _json(path: Path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + '.' + uuid.uuid4().hex + '.tmp')
+    # Keep the temporary name short: Windows installations may have MAX_PATH
+    # enabled, and restore staging already adds several directory levels.
+    descriptor, name = tempfile.mkstemp(prefix='.w-', suffix='.tmp', dir=path.parent)
+    temporary = Path(name)
     try:
-        with temporary.open('w', encoding='utf-8') as stream:
+        with os.fdopen(descriptor, 'w', encoding='utf-8') as stream:
             json.dump(data, stream, ensure_ascii=False, indent=2)
             stream.flush(); os.fsync(stream.fileno())
         temporary.replace(path)
@@ -149,8 +152,22 @@ def _rebase(value, old: str, new: str):
 
 
 def prepare_data(stage: Path, old_root: str, new_root: str):
+    archives = {
+        p.parent for p in stage.glob('outputs/road_bridge_jobs/JOB-*/bridge_summary.json')
+        if json.loads(p.read_text(encoding='utf-8')).get('archived')
+    }
     for path in stage.rglob('*'):
         if not path.is_file() or path.suffix not in {'.json', '.jsonl'}: continue
+        if path.parent in archives:
+            # Archived evidence is immutable: only the service view is relocated.
+            # Rebasing raw result JSON would invalidate the import manifest hashes.
+            if path.name != 'bridge_summary.json': continue
+            data = json.loads(path.read_text(encoding='utf-8'))
+            provenance = data.pop('archive', None)
+            data = _rebase(data, old_root, new_root)
+            if provenance is not None: data['archive'] = provenance
+            _json(path, data)
+            continue
         if path.suffix == '.json':
             _json(path, _rebase(json.loads(path.read_text(encoding='utf-8')), old_root, new_root))
         else:
