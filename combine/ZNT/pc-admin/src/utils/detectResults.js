@@ -32,6 +32,7 @@ function saveDetectResultCases(list) {
  * 将完成的检测任务写入结果汇总（幂等：同一 job_id 覆盖）
  */
 export function syncDetectJobToResults(job) {
+  if (job?.source === 'archive') return null
   if (!job || job.status !== 'done') return null
   const result = job.result || {}
   const risks = result.risks || []

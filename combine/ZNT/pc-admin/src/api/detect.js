@@ -14,7 +14,18 @@ import { getDetectApiBase, resolveDetectMediaUrl } from '@/utils/endpoints'
 export async function fetchTaskPage(params = {}) {
   const { data } = await detectHttp.get('/api/detect/recent', { params, timeout: 10000 })
   if (!Array.isArray(data?.items)) throw new Error('任务接口返回格式错误')
-  return data.items
+  return data.items.map(item => ({ ...item,
+    input_image: resolveDetectMediaUrl(item.input_image),
+    preview_image: resolveDetectMediaUrl(item.preview_image),
+  }))
+}
+export async function importDetectionArchive(file) {
+  const form = new FormData()
+  form.append('file', file)
+  return (await detectHttp.post('/api/detect/archives/import', form)).data
+}
+export async function archiveDetectJob(id) {
+  return (await detectHttp.post(`/api/detect/jobs/${encodeURIComponent(id)}/archive`)).data
 }
 export async function cancelDetectJob(id) {
   return (await detectHttp.post(`/api/detect/jobs/${encodeURIComponent(id)}/cancel`)).data

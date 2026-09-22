@@ -8,6 +8,7 @@
 - [应用源码及使用说明](combine/ZNT/README.md)
 - [环境部署说明](combine/ZNT/requirements/README.md)
 - [1.4.4 测试与验证摘要](docs/validation/v1.4.4/README.md)
+- [检测历史与原图归档](docs/DETECTION_HISTORY.md)：历史原图、标注、掩码及报告导入与长期留存。
 - [道路领域迁移检查](combine/ZNT/docs/道路领域全面迁移检查_20260921.md)
 
 ## 当前能力与边界

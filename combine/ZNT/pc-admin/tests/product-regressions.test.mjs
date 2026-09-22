@@ -3,6 +3,18 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { containRect } from '../src/utils/videoGeometry.js'
 
+test('viewing historical imports cannot create live results or work orders', async () => {
+  globalThis.localStorage = { getItem:()=>{throw new Error('archive must not read live storage')}, setItem:()=>{throw new Error('archive must not write live storage')} }
+  const job = { source:'archive', status:'done', result:{ risks:[{verified:true}], input_image:'/old.png' } }
+  for (const [file, method] of [['detectResults','syncDetectJobToResults'], ['detectWorkOrders','syncDetectJobToWorkOrders']]) {
+    const source = (await readFile(new URL(`../src/utils/${file}.js`, import.meta.url),'utf8')).replace(/^import .*$/gm,'')
+    const api = await import('data:text/javascript;base64,'+Buffer.from('const notifyModules=()=>{throw new Error("no live notifications")};\n'+source).toString('base64'))
+    const result = api[method](job)
+    if (file === 'detectResults') assert.equal(result,null)
+    else assert.equal(result.created,0)
+  }
+})
+
 test('automatic road report links follow the selected detection gateway', async () => {
   const stored = new Map()
   globalThis.localStorage = { getItem:k=>stored.get(k) ?? null }

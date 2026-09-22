@@ -59,6 +59,7 @@ function saveDetectWorkOrders(list) {
  * @returns {{ created: number, updated: number, orders: Array }}
  */
 export function syncDetectJobToWorkOrders(job) {
+  if (job?.source === 'archive') return { created: 0, updated: 0, orders: [] }
   if (!job || job.status !== 'done') return { created: 0, updated: 0, orders: [] }
   const result = job.result || {}
   const risks = (result.risks || []).filter((r) => r && (r.verified !== false || r.manual_review))

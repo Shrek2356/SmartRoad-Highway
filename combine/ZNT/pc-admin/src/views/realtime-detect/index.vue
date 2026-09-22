@@ -213,6 +213,7 @@
               <a-tag :color="statusColor(job.status)">{{ statusLabel(job.status) }}</a-tag>
               <span v-if="job.mock" class="job-meta-note">演示</span>
             </div>
+            <a-alert v-if="job?.source === 'archive'" type="info" show-icon :message="`历史检测档案 · ${job.archive?.sample_id || ''}`" description="原图、掩码和报告来自此前检测，已归档留存；本次查看不重新检测，不生成现场告警或工单。" />
             <a-alert v-if="job?.error" type="error" :message="job.error" show-icon class="job-error" />
           </div>
 
@@ -440,6 +441,7 @@ function profileLabel(id) {
     offline: '本地离线',
     demo: '浏览器演示',
     weights: '本地离线',
+    archive: '历史检测档案',
   }[id] || id || '未指定'
 }
 
@@ -463,7 +465,7 @@ function formatDuration(value) {
 }
 
 function sourceLabel(source = '') {
-  return { upload: '上传', camera: '摄像头', offline: '上传' }[source] || source || '-'
+  return { upload: '上传', camera: '摄像头', offline: '上传', archive: '历史导入' }[source] || source || '-'
 }
 
 const pendingFile = ref(null)
@@ -715,6 +717,7 @@ async function captureAndFullAudit() {
 }
 
 function ingestWorkOrders(currentJob) {
+  if (currentJob?.source === 'archive') return
   if (!currentJob || currentJob.status !== 'done') return
   syncDetectJobToResults(currentJob)
   if (currentJob._ordersSynced) return

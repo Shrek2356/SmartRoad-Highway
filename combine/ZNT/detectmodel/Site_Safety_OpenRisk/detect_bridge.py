@@ -361,7 +361,7 @@ class DetectBridge:
             raise KeyError(job_id)
         return job
 
-    def recent(self, limit: int = 20, offset: int = 0, status: str = "") -> list:
+    def recent(self, limit: int = 20, offset: int = 0, status: str = "", archived_only: bool = False) -> list:
         with self.lock:
             by_id = dict(self.jobs)
         for summary in self.jobs_root.glob("JOB-*/bridge_summary.json"):
@@ -371,7 +371,8 @@ class DetectBridge:
                 by_id[summary.parent.name] = json.loads(summary.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-        items = [j for j in by_id.values() if not status or j.get("status") == status]
+        items = [j for j in by_id.values() if (not status or j.get("status") == status)
+                 and (not archived_only or j.get("archived"))]
         items.sort(key=lambda x: x.get("created_at", ""), reverse=True)
         return [
             {
@@ -385,9 +386,31 @@ class DetectBridge:
                 "error": j.get("error"),
                 "elapsed_ms": (j.get("timings_ms") or {}).get("total"),
                 "updated_at": j.get("updated_at"),
+                "archived": bool(j.get("archived")),
+                "archive": {k: v for k, v in (j.get("archive") or {}).items() if k != "files"},
+                "input_image": (j.get("result") or {}).get("input_image"),
+                "preview_image": ((j.get("result") or {}).get("scene_annotation")
+                                  or next(iter((j.get("result") or {}).get("overlays") or []), None)
+                                  or (j.get("result") or {}).get("input_image")),
             }
             for j in items[offset:offset + limit]
         ]
+
+    def archive_job(self, job_id: str) -> dict:
+        if Path(job_id).name != job_id or not job_id.startswith("JOB-"):
+            raise KeyError(job_id)
+        with self.lock:
+            summary = self.jobs_root / job_id / "bridge_summary.json"
+            if not summary.is_file():
+                raise KeyError(job_id)
+            job = self.jobs.get(job_id) or json.loads(summary.read_text(encoding="utf-8"))
+            if job["status"] != "done":
+                raise HTTPException(409, "检测完成后才可归档留存")
+            job["archived"] = True
+            job["updated_at"] = _now()
+            self._persist_job(job)
+            self.jobs[job_id] = job
+        return {"ok": True, "job_id": job_id, "archived": True}
 
     def cancel_job(self, job_id: str) -> dict:
         with self.lock:
@@ -417,9 +440,13 @@ class DetectBridge:
         )
 
     def media_path(self, job_id: str, filename: str) -> Path:
+        try:
+            self.get_job(job_id)
+        except KeyError:
+            raise HTTPException(404, "任务不存在") from None
         path = (self.jobs_root / job_id / filename).resolve()
-        root = self.jobs_root.resolve()
-        if root not in path.parents and path.parent != root:
+        root = (self.jobs_root / job_id).resolve()
+        if not path.is_relative_to(root):
             raise HTTPException(400, "非法路径")
         if not path.is_file():
             raise HTTPException(404, "文件不存在")
@@ -475,7 +502,10 @@ class DetectBridge:
             summary = directory / "bridge_summary.json"
             status = ""
             try:
-                status = json.loads(summary.read_text(encoding="utf-8")).get("status", "")
+                document = json.loads(summary.read_text(encoding="utf-8"))
+                if document.get("archived"):
+                    continue  # Archives are retained until explicitly removed, never as cache.
+                status = document.get("status", "")
             except (OSError, ValueError):
                 pass
             size = sum(path.stat().st_size for path in directory.rglob("*") if path.is_file())
@@ -488,10 +518,19 @@ class DetectBridge:
             over_budget = total_bytes > self.retention_max_gb * 1024**3
             if mtime >= cutoff and not over_budget:
                 continue
-            shutil.rmtree(directory, ignore_errors=True)
-            total_bytes = max(0, total_bytes - size)
-            removed += 1
-        return {"removed": removed, "remaining_bytes": total_bytes}
+            with self.lock:
+                try:
+                    latest = json.loads((directory / "bridge_summary.json").read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                if latest.get("archived"):
+                    continue  # A user may have retained it after the initial scan.
+                shutil.rmtree(directory, ignore_errors=True)
+                if not directory.exists():
+                    self.jobs.pop(directory.name, None)
+                    total_bytes = max(0, total_bytes - size)
+                    removed += 1
+        return {"removed": removed, "remaining_bytes": total_bytes, "archives_excluded": True}
 
     def _job_worker(self) -> None:
         while True:
@@ -1265,12 +1304,37 @@ def create_app(bridge: DetectBridge) -> FastAPI:
         return {"ok": True, "persisted": payload.persist, **bridge.health()}
 
     @app.get("/api/detect/recent")
-    def recent(limit: int = 20, offset: int = 0, status: str = "") -> dict:
+    def recent(limit: int = 20, offset: int = 0, status: str = "", archived_only: bool = False) -> dict:
         if not 1 <= limit <= 100:
             raise HTTPException(400, "limit 必须在 1 到 100 之间")
         if offset < 0 or status not in {"", "queued", "running", "done", "error", "cancelled"}:
             raise HTTPException(400, "分页或状态参数无效")
-        return {"items": bridge.recent(limit, offset, status)}
+        return {"items": bridge.recent(limit, offset, status, archived_only)}
+
+    @app.post("/api/detect/archives/import")
+    def import_history(file: UploadFile = File(...)) -> dict:
+        import zipfile
+        from site_safety.detection_archive import import_archive, MAX_UPLOAD
+        if not (file.filename or "").lower().endswith(".zip"):
+            raise HTTPException(400, "请选择检测档案ZIP")
+        file.file.seek(0, 2)
+        size = file.file.tell()
+        file.file.seek(0)
+        if size > MAX_UPLOAD:
+            raise HTTPException(413, "检测档案超过120MB，请分批导入")
+        try:
+            # Python 3.10's SpooledTemporaryFile lacks the seekable attribute
+            # required by ZipFile, while the desktop runtime also supports 3.11+.
+            return import_archive(bridge, io.BytesIO(file.file.read()))
+        except (ValueError, KeyError, TypeError, OSError, zipfile.BadZipFile) as exc:
+            raise HTTPException(422, f"档案导入失败：{exc}") from exc
+
+    @app.post("/api/detect/jobs/{job_id}/archive")
+    def archive_job(job_id: str) -> dict:
+        try:
+            return bridge.archive_job(job_id)
+        except KeyError:
+            raise HTTPException(404, "任务不存在") from None
 
     @app.post("/api/detect/jobs/{job_id}/cancel")
     def cancel_job(job_id: str) -> dict:
