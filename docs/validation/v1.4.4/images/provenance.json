@@ -1,0 +1,29 @@
+{
+  "purpose": "Unmodified examples selected for explanation; all 15 samples are retained in the full report.",
+  "images": [
+    {
+      "file": "S10-wet-normal.png",
+      "source_in_report_bundle": "道路检测v5_验证附件_20260922/run_v5_grounded/S10/scene_annotation.png",
+      "sha256": "a9e6aa306635f5b2d8cf4262cd137ef229bbb01a96fc5f0abb83d0cdd01bab42",
+      "modified": false
+    },
+    {
+      "file": "S02-floodwater.png",
+      "source_in_report_bundle": "道路检测v5_验证附件_20260922/run_v5_grounded/S02/overlay_water_accumulation.png",
+      "sha256": "66a62c51bbb6aeb214a8ca0f8517ed75a91506a24332a5fe14251940cddd7ee1",
+      "modified": false
+    },
+    {
+      "file": "S04-road-debris.png",
+      "source_in_report_bundle": "道路检测v5_验证附件_20260922/run_v5_grounded/S04/overlay_road_debris.png",
+      "sha256": "14cc6a7ec87a0ea4150fc5d2c1ed23282a99595e2aebafb9fed49bace16f06ae",
+      "modified": false
+    },
+    {
+      "file": "N03-wet-normal.png",
+      "source_in_report_bundle": "道路检测v5_验证附件_20260922/run_v5_grounded/N03/scene_annotation.png",
+      "sha256": "8302a78021f0e1061e280a9b0111c35fd0322896fc5be1434dbefe852ad12877",
+      "modified": false
+    }
+  ]
+}
