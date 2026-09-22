@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Preserve the exact bytes used by the bundled regulation provenance hashes.
+combine/ZNT/detectmodel/Site_Safety_OpenRisk/examples/road_knowledge/** -text

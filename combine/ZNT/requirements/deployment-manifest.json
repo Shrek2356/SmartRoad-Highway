@@ -1,0 +1,116 @@
+{
+  "schema_version": 4,
+  "delivery_version": "2026-09-road-lab",
+  "desktop": {
+    "entry": "SmartRoad-Inspection.exe",
+    "webview": "Microsoft Edge WebView2 Runtime",
+    "demo_python": "bundled Python 3.12",
+    "node_required_for_prebuilt_desktop": false,
+    "settings_ui": "系统设置 → 桌面与连接",
+    "model_runtime_ui": "模型规则配置 → llama-server.exe / 模型部件路径"
+  },
+  "artifact_policy": {
+    "code_package_contains_model_weights": false,
+    "model_weights_delivery": "separate-model-bundle",
+    "note": "道路端侧模型尚未训练；当前不启用历史工地初筛权重。",
+    "project_weights_url": ""
+  },
+  "presentation_assets": {
+    "enabled_by_default": false,
+    "disable_build_env": "VITE_ENABLE_PRESENTATION_ASSETS=false",
+    "scope": "frontend-only; does not alter real detection or Agent records"
+  },
+  "recommended_environment": {
+    "os": "Windows 10/11 x64",
+    "python": "3.12 x64 for new official SAM3 environments; historical adapted 3.10 is not a fresh-install recipe",
+    "node": "Not required for the prebuilt desktop package",
+    "ram_gb_min_offline": 32,
+    "ram_gb_recommended_offline": 64,
+    "disk_free_gb_recommended": 35,
+    "gpu_vram_gb_min_offline": 12,
+    "gpu_vram_gb_recommended_offline": 16
+  },
+  "models": {
+    "qwen_model_path": {
+      "label": "本地 Qwen 视觉模型",
+      "required_for": [
+        "offline"
+      ],
+      "expected_name": "Qwen3-VL-8B-Instruct-Q4_K_M.gguf",
+      "approx_gb": 4.68,
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "relative_path": "models/qwen/Qwen3-VL-8B-Instruct-Q4_K_M.gguf",
+      "note": "与 mmproj 从同一仓库、同一修订版本取得；本项目使用 Q4_K_M。",
+      "download_url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "sha256": ""
+    },
+    "qwen_mmproj_path": {
+      "label": "Qwen 视觉投影文件",
+      "required_for": [
+        "offline"
+      ],
+      "expected_name": "mmproj-BF16.gguf",
+      "approx_gb": 1.08,
+      "source": "Use the mmproj paired with the exact Qwen GGUF repository/revision",
+      "relative_path": "models/qwen/mmproj-BF16.gguf",
+      "note": "这是识图必需文件，不是可省略附件。文件存在不等于与 GGUF 配对正确。",
+      "download_url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "sha256": ""
+    },
+    "sam3_checkpoint_path": {
+      "label": "SAM3 风险定位权重",
+      "required_for": [
+        "offline",
+        "cloud"
+      ],
+      "expected_name": "sam3.pt",
+      "approx_gb": 3.21,
+      "source": "https://github.com/facebookresearch/sam3",
+      "relative_path": "models/sam3/sam3.pt",
+      "note": "需按官方流程获取授权；使用 sam3.pt 与匹配代码，不自动替换 SAM 3.1。",
+      "download_url": "https://github.com/facebookresearch/sam3",
+      "sha256": ""
+    },
+    "clip_checkpoint_path": {
+      "label": "CLIP 可选辅助",
+      "required_for": [],
+      "expected_name": "ViT-L-14.pt",
+      "approx_gb": 0.87,
+      "source": "https://github.com/mlfoundations/open_clip",
+      "relative_path": "models/clip/ViT-L-14.pt",
+      "note": "默认关闭；不影响当前主链。启用时才准备权重并验证依赖。",
+      "download_url": "https://github.com/mlfoundations/open_clip",
+      "sha256": ""
+    },
+    "llama_server_path": {
+      "label": "llama.cpp 推理引擎",
+      "required_for": [
+        "offline"
+      ],
+      "expected_name": "llama-server.exe",
+      "relative_path": "third_party/llama.cpp/llama-server.exe",
+      "download_url": "https://github.com/ggml-org/llama.cpp/releases",
+      "source": "https://github.com/ggml-org/llama.cpp/releases",
+      "note": "解压 Windows x64 CUDA 发行包并保留同包 DLL；在前端选择 exe，不必修改系统 PATH。"
+    },
+    "sam3_repo_path": {
+      "label": "SAM3 代码与安装",
+      "required_for": [
+        "offline",
+        "cloud"
+      ],
+      "relative_path": "third_party/sam3-main",
+      "download_url": "https://github.com/facebookresearch/sam3",
+      "source": "https://github.com/facebookresearch/sam3",
+      "note": "下载代码不等于已安装。用当前检测 Python 执行 pip install -e 该目录；新建官方环境使用 Python 3.12。"
+    }
+  },
+  "links": {
+    "python": "https://www.python.org/downloads/windows/",
+    "pytorch": "https://pytorch.org/get-started/locally/",
+    "webview2": "https://developer.microsoft.com/en-us/microsoft-edge/webview2/",
+    "sam3": "https://github.com/facebookresearch/sam3",
+    "llama": "https://github.com/ggml-org/llama.cpp/releases"
+  },
+  "domain": "road"
+}

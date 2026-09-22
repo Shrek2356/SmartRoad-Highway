@@ -1,0 +1,21 @@
+{
+  "risk_overrides": {
+    "missing_helmet": {
+      "min_verified_confidence": 0.85,
+      "proposal_id": "TP-20260726-ade51b05",
+      "approved_by": "safety_manager_demo",
+      "approved_at": "2026-07-26T11:03:48-07:00"
+    }
+  },
+  "history": [
+    {
+      "at": "2026-07-26T11:03:48-07:00",
+      "action": "approve",
+      "proposal_id": "TP-20260726-ade51b05",
+      "risk_id": "missing_helmet",
+      "min_verified_confidence": 0.95,
+      "by": "safety_manager_demo",
+      "note": ""
+    }
+  ]
+}

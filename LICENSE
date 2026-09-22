@@ -1,0 +1,51 @@
+SiteSafe-Sentinel Proprietary Source-Available License v1.0
+
+Copyright (c) 2026 SiteSafe-Sentinel Project Authors. All Rights Reserved.
+
+1. Scope
+
+This license applies only to the original source code, system architecture,
+documentation, interface design, risk rules, data-processing workflows, and
+other original materials created specifically for SiteSafe-Sentinel.
+
+2. Limited permission for authorized recipients
+
+An authorized repository collaborator may view, clone, and run the Software
+solely for private evaluation, competition review, academic demonstration, or
+internal non-commercial testing. This permission is personal, limited,
+non-exclusive, non-transferable, and revocable.
+
+3. Restrictions
+
+Unless the copyright owner gives prior written permission, no person or
+organization may:
+
+- publish, redistribute, sublicense, sell, rent, or commercially exploit the Software;
+- use it in production or incorporate it into another product or service;
+- modify it or create and distribute derivative works;
+- use the Software, its outputs, prompts, rules, or documentation to train models
+  or develop a competing system;
+- remove or alter authorship, copyright, attribution, or license notices;
+- represent the Software or substantially similar work as their own.
+
+Public visibility or access through GitHub does not grant rights beyond those
+required by GitHub's Terms of Service and the limited permission stated above.
+
+4. Third-party materials
+
+Third-party software, models, weights, datasets, fonts, images, character
+materials, and trademarks remain governed by their respective licenses and
+owners. This license does not claim ownership of those materials and does not
+override their terms. See THIRD_PARTY_NOTICE.md.
+
+5. No patent or trademark license
+
+No patent, trademark, trade-name, or branding license is granted by this file.
+
+6. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM
+EXTENT PERMITTED BY LAW, THE AUTHORS SHALL NOT BE LIABLE FOR CLAIMS OR DAMAGES
+ARISING FROM ITS USE.
+
+For research, deployment, or commercial authorization, contact the repository owner.

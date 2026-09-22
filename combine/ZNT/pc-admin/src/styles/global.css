@@ -1,0 +1,57 @@
+/* Colors are applied by utils/theme.js from utils/designTokens.js. */
+:root { --bg-card:var(--surface); --warm-panel:var(--surface-2); --warm-dark:var(--product-ink); }
+* { box-sizing:border-box; }
+html, body, #app {
+  margin:0; padding:0; height:100%; min-height:100%;
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg); color:var(--text-primary); -webkit-font-smoothing:antialiased;
+}
+body { font-size:14px; line-height:1.65; }
+a { color:var(--link); }
+a:hover { color:var(--primary-strong); }
+h1,h2,h3,h4,h5,h6 { color:var(--text-primary); }
+.page-card { background:var(--surface); border:1px solid var(--border-color); border-radius:var(--card-radius); padding:24px; box-shadow:var(--shadow-card); }
+.page-title { font-size:26px; font-weight:650; letter-spacing:-.6px; margin-bottom:16px; color:var(--text-primary); }
+.ant-btn { font-weight:500; }
+/* Keep ghost, danger and disabled states independent from filled actions. */
+.ant-btn-primary:not(.ant-btn-dangerous):not(.ant-btn-background-ghost):not(:disabled) {
+  background:var(--primary); border-color:var(--primary); color:var(--on-primary);
+}
+.ant-btn-primary:not(.ant-btn-dangerous):not(.ant-btn-background-ghost):not(:disabled):hover {
+  background:var(--primary-strong); border-color:var(--primary-strong); color:var(--on-primary);
+}
+.ant-btn-primary.ant-btn-background-ghost:not(.ant-btn-dangerous):not(:disabled) { background:transparent; color:var(--primary); border-color:var(--primary); }
+.ant-btn-primary.ant-btn-dangerous:not(.ant-btn-background-ghost):not(:disabled) { background:var(--danger); border-color:var(--danger); color:var(--on-danger); }
+.ant-btn-dangerous.ant-btn-background-ghost:not(:disabled) { background:transparent; border-color:var(--danger); color:var(--danger); }
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background:var(--primary-soft)!important; border-color:var(--primary)!important; color:var(--link)!important;
+}
+.ant-tabs-tab { font-weight:500; }
+.ant-table-thead > tr > th { background:var(--surface-2)!important; color:var(--text-secondary)!important; font-weight:600; font-size:12px; }
+.ant-table-tbody > tr.ant-table-row:hover > td { background:var(--surface-2)!important; }
+.ant-table-tbody > tr.ant-table-row-selected > td { background:var(--primary-soft)!important; }
+.ant-tag { border-radius:6px; }
+.ant-tag-blue,.ant-tag-geekblue { --tag-color:var(--info); }
+.ant-tag-cyan { --tag-color:var(--link); }
+.ant-tag-green,.ant-tag-success { --tag-color:var(--success); }
+.ant-tag-red,.ant-tag-error { --tag-color:var(--danger); }
+.ant-tag-orange,.ant-tag-warning { --tag-color:var(--warning); }
+.ant-tag-gold { --tag-color:var(--caution); }
+.ant-tag-purple { --tag-color:var(--chart-4); }
+:root :is(.ant-tag-blue,.ant-tag-geekblue,.ant-tag-cyan,.ant-tag-green,.ant-tag-success,.ant-tag-red,.ant-tag-error,.ant-tag-orange,.ant-tag-warning,.ant-tag-gold,.ant-tag-purple) {
+  color:var(--tag-color); background:color-mix(in srgb,var(--tag-color) 8%,var(--surface)); border-color:color-mix(in srgb,var(--tag-color) 28%,var(--border-color));
+}
+.ant-checkbox-checked .ant-checkbox-inner::after { border-color:var(--on-primary); }
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) { background:var(--primary-soft)!important; color:var(--text-primary)!important; }
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) { background:var(--surface-muted); }
+:where(button,a,input,[tabindex]):focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+.risk-red { color:var(--danger); }
+.risk-orange { color:var(--warning); }
+.risk-yellow { color:var(--caution); }
+::selection { background:var(--primary-soft); color:var(--text-primary); }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-thumb { background:color-mix(in srgb,var(--text-muted) 35%,transparent); border-radius:8px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
+}

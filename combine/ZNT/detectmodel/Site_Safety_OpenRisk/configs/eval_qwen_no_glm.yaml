@@ -1,0 +1,75 @@
+project_name: Site Safety OpenRisk Training-Free
+random_seed: 42
+
+risk_operators:
+  path: configs/risk_operators.yaml
+
+mllm:
+  backend: openai_compatible
+  api_key_env: DASHSCOPE_API_KEY
+  base_url_env: QWEN_MLLM_BASE_URL
+  model_env: QWEN_MLLM_MODEL
+  timeout_seconds: 180
+  max_retries: 3
+  temperature: 0.1
+  use_response_format: true
+  payload_extra:
+    enable_thinking: false
+  system_prompt: >-
+    你是一名谨慎的施工现场视觉安全分析助手。只根据输入图像中的可见证据判断，
+    不推测设备运行状态、人员权限、施工阶段或不可见信息。输出必须是严格JSON。
+
+# 评测只需要visual_verification.json，关闭GLM报告层以降低成本与耗时。
+report_llm:
+  enabled: false
+
+sam3:
+  backend: bridge
+  bridge_module: integrations.sam3_bridge_user
+  bridge_class: SAM3Bridge
+  init_kwargs:
+    repo_path: 'E:\SAM3_MAIN\sam3-main'
+    checkpoint: 'E:\SAM3_MAIN\SAM3\sam3.pt'
+    device: cuda
+    confidence_threshold: 0.20
+    amp_dtype: bfloat16
+
+clip:
+  enabled: true
+  backend: bridge
+  bridge_module: integrations.clip_bridge_user
+  bridge_class: CLIPBridge
+  init_kwargs:
+    model_name: ViT-L-14
+    checkpoint: 'C:\Users\SYS03\.cache\clip\ViT-L-14.pt'
+    device: cuda
+    precision: fp16
+  minimum_consistency_score: 0.20
+
+risk_catalog:
+  path: examples/risk_catalog.json
+  include_all_core: true
+  distractor_count: 3
+  allow_open_discovery: true
+
+pipeline:
+  segment_statuses: [present, uncertain]
+  min_mllm_candidate_confidence: 0.25
+  min_sam3_score: 0.20
+  max_sam3_tasks: 24
+  run_second_pass: true
+  save_entity_masks: true
+  save_risk_crops: true
+  second_pass_max_overlays: 6
+  relation_defaults:
+    horizontal_overlap_threshold: 0.25
+    near_distance_ratio: 0.30
+    overlap_threshold: 0.10
+    inside_threshold: 0.50
+    allow_missing_from_non_detection: false
+    allow_missing_from_visible_zone: true
+    confirmed_absence_confidence_cap: 0.90
+  mask_defaults:
+    projected_width_expand_ratio: 0.15
+    projected_max_object_height_ratio: 4.0
+    projected_max_image_height_ratio: 0.55

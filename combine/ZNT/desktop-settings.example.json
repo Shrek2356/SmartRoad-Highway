@@ -1,0 +1,10 @@
+{
+  "profile": "demo",
+  "backend_python": "python-runtime/python.exe",
+  "business_port": 8800,
+  "bridge_port": 8810,
+  "frontend_port": 5173,
+  "window_width": 1440,
+  "window_height": 900,
+  "confirm_close": true
+}

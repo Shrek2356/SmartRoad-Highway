@@ -1,0 +1,16 @@
+[
+  {
+    "notification_id": "NT-670fc5c6",
+    "created_at": "2026-08-09T03:14:22-07:00",
+    "channel": "outbox",
+    "targets": [
+      "safety_director",
+      "site_manager",
+      "area_foreman"
+    ],
+    "title": "[重大风险] 人员异常倒地",
+    "body": "设备EXAMPLE-08检测到人员异常倒地，工单WO-20260809-f06aa333，请在2026-08-09T05:14:22-07:00前完成整改确认。首要处置：立即派人现场查看伤情，必要时拨打120并启动应急预案",
+    "event_id": "EVT-20260809-5d0c261a",
+    "work_order_id": "WO-20260809-f06aa333"
+  }
+]

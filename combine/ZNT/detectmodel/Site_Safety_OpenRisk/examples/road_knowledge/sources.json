@@ -1,0 +1,56 @@
+{
+  "中华人民共和国道路交通安全法_2021_道路巡检相关条款.md": {
+    "title": "中华人民共和国道路交通安全法",
+    "issuer": "全国人民代表大会常务委员会",
+    "version": "2021年4月29日第三次修正",
+    "source_url": "https://www.beijing.gov.cn/zhengce/zhengcefagui/qtwj/202307/t20230710_3158807.html",
+    "retrieved_at": "2026-09-22T06:52:44.670183+00:00",
+    "domain": "road",
+    "sha256": "054f437943a7cb98a38b7af0cc7fe732c81ce0e324b932d3b277e1cb2c48d311",
+    "raw_source_file": "official_source.html",
+    "raw_source_sha256": "211c3d6847b762adbbfa20c230ab2e756283ef9e74cb298544fc6e23a35962be",
+    "scope": "道路巡检相关10条摘录，非全文；原文保留网页的坑漕用字。效力应在正式应用前由管理方复核。",
+    "sections": {
+      "第二十五条": {
+        "regulation_id": "RTSL-2021-25",
+        "applicability": "适用于交通信号设施设置与维护。画面不能证明是否符合全部国家标准。"
+      },
+      "第二十八条": {
+        "regulation_id": "RTSL-2021-28",
+        "applicability": "适用于信号设施损毁、遮挡等线索，是否擅自设置或损毁需人工核查。"
+      },
+      "第三十条": {
+        "regulation_id": "RTSL-2021-30",
+        "applicability": "仅在道路或交通设施损毁成立时，供养护或管理部门处置参考；不是病害尺寸或等级判定标准。"
+      },
+      "第三十二条": {
+        "regulation_id": "RTSL-2021-32",
+        "applicability": "仅在确认道路施工作业时参考；图像不能证明审批情况或验收条件。"
+      },
+      "第四十条": {
+        "regulation_id": "RTSL-2021-40",
+        "applicability": "仅供严重灾害、气象或重大事故的升级响应参考。交通管制决定权属于公安机关交通管理部门。"
+      },
+      "第四十八条": {
+        "regulation_id": "RTSL-2021-48",
+        "applicability": "仅在有载运物遗洒等证据时参考；不从路面异物推定来源车辆、超载或责任。"
+      },
+      "第五十二条": {
+        "regulation_id": "RTSL-2021-52",
+        "applicability": "仅在另有证据确认机动车故障时适用；静态停车图不能认定故障。"
+      },
+      "第六十七条": {
+        "regulation_id": "RTSL-2021-67",
+        "applicability": "仅在确认高速公路路段、主体及作业背景后核查适用性；不从单图推断人员身份。"
+      },
+      "第六十八条": {
+        "regulation_id": "RTSL-2021-68",
+        "applicability": "仅适用于已确认的高速公路故障、事故及法定条件；单张图不证明示警距离是否达标。"
+      },
+      "第七十条": {
+        "regulation_id": "RTSL-2021-70",
+        "applicability": "仅在确认交通事故及其具体条件后参考；伤亡、责任及能否撤离不可从图片推断。"
+      }
+    }
+  }
+}

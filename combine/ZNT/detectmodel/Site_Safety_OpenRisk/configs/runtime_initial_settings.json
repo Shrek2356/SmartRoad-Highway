@@ -1,0 +1,15 @@
+{
+  "qwen_enabled": true,
+  "qwen_autostart": true,
+  "yolo_enabled": true,
+  "sam3_enabled": true,
+  "clip_enabled": false,
+  "qwen_model_path": "..\\..\\..\\weights\\Qwen3-VL-8B-Instruct-Q4_K_M.gguf",
+  "qwen_mmproj_path": "..\\..\\..\\weights\\mmproj-BF16.gguf",
+  "qwen_base_url": "http://127.0.0.1:8080/v1/chat/completions",
+  "sam3_repo_path": "..\\..\\..\\sam3-main",
+  "sam3_checkpoint_path": "..\\..\\..\\weights\\sam3.pt",
+  "clip_checkpoint_path": "",
+  "yolo_css_weights_path": "..\\..\\..\\yolo_site_workspace_portable\\weights\\yolo26m_css_v28_baseline_best.pt",
+  "yolo_construction_weights_path": "..\\..\\..\\yolo_site_workspace_portable\\weights\\yolo26m_construction_site_best.pt"
+}

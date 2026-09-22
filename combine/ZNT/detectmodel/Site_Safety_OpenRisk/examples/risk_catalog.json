@@ -1,0 +1,120 @@
+{
+  "core": [
+    {
+      "risk_id": "missing_helmet",
+      "name_zh": "施工人员未佩戴安全帽",
+      "description": "施工人员头部未观察到安全帽。",
+      "entity_hints": ["construction worker", "worker head", "safety helmet"],
+      "relation_hint": "missing",
+      "mask_strategy_hint": "missing_subject"
+    },
+    {
+      "risk_id": "worker_under_suspended_load",
+      "name_zh": "人员位于悬吊物下方",
+      "description": "人员位于悬吊构件下方或其垂直投影区域内。",
+      "entity_hints": ["construction worker", "suspended construction load"],
+      "relation_hint": "below_and_horizontal_overlap",
+      "mask_strategy_hint": "projected_below"
+    },
+    {
+      "risk_id": "fallen_worker",
+      "name_zh": "人员异常倒地",
+      "description": "人员横卧、倒地或呈现明显异常姿态。",
+      "entity_hints": ["person lying on the ground"],
+      "relation_hint": "none",
+      "mask_strategy_hint": "entity_union"
+    },
+    {
+      "risk_id": "blocked_passage",
+      "name_zh": "安全通道被材料堵塞",
+      "description": "建筑材料、设备或杂物占用可通行区域。",
+      "entity_hints": ["construction passage", "construction materials or obstacles"],
+      "relation_hint": "blocks_region",
+      "mask_strategy_hint": "intersection"
+    },
+    {
+      "risk_id": "smoke_or_fire",
+      "name_zh": "现场存在烟雾或火焰",
+      "description": "施工区域内出现可见烟雾或火焰。",
+      "entity_hints": ["smoke", "fire or flame"],
+      "relation_hint": "none",
+      "mask_strategy_hint": "entity_union"
+    },
+    {
+      "risk_id": "missing_edge_protection",
+      "name_zh": "临边防护缺失",
+      "description": "清晰可见的临边、洞口或高差检查区域缺少护栏、踢脚板、盖板或安全网。",
+      "entity_hints": [
+        "visible construction edge or floor opening",
+        "safety guardrail",
+        "toe board",
+        "opening cover or safety net"
+      ],
+      "relation_hint": "missing",
+      "mask_strategy_hint": "missing_subject",
+      "absence_protocol": {
+        "inspection_anchor": "visible construction edge or floor opening",
+        "required_items": ["safety guardrail", "toe board", "opening cover or safety net"],
+        "confirmed_only_when": "inspection zone is clear and the required protection is visibly absent"
+      }
+    },
+    {
+      "risk_id": "missing_fall_protection",
+      "name_zh": "高处作业防坠落装备缺失",
+      "description": "高处临边或脚手架作业人员在腰背部及连接区域清晰可见时，未见安全带、安全绳或可靠挂点连接。",
+      "entity_hints": [
+        "worker performing work at height",
+        "worker waist and back area",
+        "safety harness",
+        "attached safety lanyard",
+        "fall arrest anchor point"
+      ],
+      "relation_hint": "missing",
+      "mask_strategy_hint": "missing_subject",
+      "absence_protocol": {
+        "inspection_anchor": "worker performing work at height with visible waist and back",
+        "required_items": ["safety harness", "attached safety lanyard", "fall arrest anchor point"],
+        "confirmed_only_when": "worker waist, back and connection area are clear and no fall protection is visible"
+      }
+    },
+    {
+      "risk_id": "machinery_proximity",
+      "name_zh": "人员过度靠近施工机械",
+      "description": "人员与挖掘机、装载机等施工机械距离过近。",
+      "entity_hints": ["construction worker", "excavator or heavy construction machinery"],
+      "relation_hint": "near",
+      "mask_strategy_hint": "expanded_object_zone"
+    },
+    {
+      "risk_id": "collapsed_scaffold",
+      "name_zh": "脚手架异常变形或坍塌",
+      "description": "脚手架存在明显倾斜、变形、断裂或坍塌。",
+      "entity_hints": ["damaged or collapsed scaffold"],
+      "relation_hint": "none",
+      "mask_strategy_hint": "entity_union"
+    },
+    {
+      "risk_id": "electrical_cable_on_wet_floor",
+      "name_zh": "潮湿区域电缆触电风险",
+      "description": "施工电缆、电气接头或用电设备位于积水、明显潮湿地面或缺少隔离保护。",
+      "entity_hints": ["electrical cables on construction floor", "wet construction floor or standing water"],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "entity_union"
+    },
+    {
+      "risk_id": "unsafe_scaffold_platform",
+      "name_zh": "脚手架作业平台防护不完整",
+      "description": "脚手架作业平台存在跳板缺失、铺设不完整、护栏缺失或明显不安全开口。",
+      "entity_hints": ["unsafe scaffold platform", "missing scaffold planks", "missing scaffold guardrail"],
+      "relation_hint": "none",
+      "mask_strategy_hint": "entity_union"
+    }
+  ],
+  "distractors": [
+    {"risk_id": "flooding", "name_zh": "大面积洪水", "description": "现场存在大范围洪水淹没。"},
+    {"risk_id": "wild_animal", "name_zh": "大型野生动物闯入", "description": "大型野生动物进入施工区。"},
+    {"risk_id": "aircraft_collision", "name_zh": "航空器碰撞", "description": "航空器与施工设施发生碰撞。"},
+    {"risk_id": "chemical_tank_leak", "name_zh": "大型化学储罐泄漏", "description": "大型化学储罐出现明显泄漏。"},
+    {"risk_id": "rail_derailment", "name_zh": "列车脱轨", "description": "施工现场附近出现列车脱轨。"}
+  ]
+}

@@ -1,0 +1,37 @@
+✔ deployment modes require only their own components (0.956ms)
+✔ empty project download is not an invented or dangerous URL (0.163ms)
+✔ environment success does not claim inference passed (0.9773ms)
+✔ installation commands are quoted and never target portable Demo Python (0.4389ms)
+✔ mode changes invalidate reports and page entry does not trigger checks (4.0388ms)
+✔ every operational route has contextual guidance and a registered next step (4.2974ms)
+✔ help, role menus and actionable destinations agree (0.5133ms)
+✔ search supports operational keywords, trims whitespace and filters restricted settings (0.4689ms)
+✔ diagnostics distinguish unknown, configured and runtime-ready, without claiming inference success (0.2369ms)
+✔ exported support snapshot never copies secrets, paths, images or identities (1.0801ms)
+✔ real detection cannot silently degrade to demo when service disconnects (0.1523ms)
+✔ connection configuration accepts service URLs, not weights or credentials (0.4024ms)
+✔ mode refresh no longer changes the selected intent and deep-linked jobs load on mount (1.6261ms)
+✔ automatic road report links follow the selected detection gateway (6.63ms)
+✔ normal scene keeps green annotation without fabricating a risk or a binary mask (5.0778ms)
+✔ portrait and landscape overlays stay on the contained image, not black bars (0.7267ms)
+✔ real login uses the entered account and password, not the role preset (1.41ms)
+✔ road lab never enables construction showcase fixtures (0.8117ms)
+✔ native exports preserve bytes and distinguish saved, cancelled and failed (1.6909ms)
+✔ browser export only reports requested and cleans up after the click (0.5192ms)
+✔ actual analysis loader ignores old project responses and responses after unmount (3.4064ms)
+✔ threshold save failure restores the persisted value and does not claim success (1.2478ms)
+✔ project metadata update returns the project, not an out-of-scope response (0.5416ms)
+✔ light: core text, controls and status colors have readable contrast (1.1717ms)
+✔ light: component, CSS and chart palettes agree; action is not danger (0.1962ms)
+✔ dark: core text, controls and status colors have readable contrast (0.1642ms)
+✔ dark: component, CSS and chart palettes agree; action is not danger (0.0809ms)
+✔ both themes cover the same tokens; all are concrete CSS values (0.4677ms)
+✔ global theme leaves semantic progress and disabled states to the component library (3.9939ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 221.7921

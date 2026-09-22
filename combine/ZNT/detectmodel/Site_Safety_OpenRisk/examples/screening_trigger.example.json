@@ -1,0 +1,21 @@
+{
+  "triggered": true,
+  "anomaly_score": 0.81,
+  "suspected_regions": [
+    {
+      "region_id": "region_1",
+      "bbox_xyxy": [420, 180, 610, 720],
+      "score": 0.86,
+      "label": "person_without_clear_ppe",
+      "coordinate_space": "pixel_xyxy"
+    }
+  ],
+  "suspected_concepts": [
+    "person",
+    "helmet",
+    "fall_protection"
+  ],
+  "source_model": "edge_screening_model",
+  "calibration_version": "v1",
+  "reason": "High-recall edge detector selected this frame for detailed review."
+}

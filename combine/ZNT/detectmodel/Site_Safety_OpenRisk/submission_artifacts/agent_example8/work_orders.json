@@ -1,0 +1,37 @@
+[
+  {
+    "schema_version": "1.0",
+    "work_order_id": "WO-20260809-f06aa333",
+    "event_id": "EVT-20260809-5d0c261a",
+    "risk_id": "fallen_worker",
+    "risk_name_zh": "人员异常倒地",
+    "risk_level": "critical",
+    "risk_level_zh": "重大风险",
+    "status": "pending_confirmation",
+    "created_at": "2026-08-09T03:14:22-07:00",
+    "due_at": "2026-08-09T05:14:22-07:00",
+    "site_id": "SITE-DEMO",
+    "device_id": "EXAMPLE-08",
+    "assignee": null,
+    "notify_targets": [
+      "safety_director",
+      "site_manager",
+      "area_foreman"
+    ],
+    "disposal_recommendations": [
+      "立即派人现场查看伤情，必要时拨打120并启动应急预案",
+      "保护现场，安排人员陪护，严禁随意移动重伤人员",
+      "查明倒地原因（中暑/触电/高坠/物体打击）并上报"
+    ],
+    "rectification_note": "",
+    "history": [
+      {
+        "at": "2026-08-09T03:14:22-07:00",
+        "from_status": null,
+        "to_status": "pending_confirmation",
+        "by": "system",
+        "note": "系统自动创建"
+      }
+    ]
+  }
+]

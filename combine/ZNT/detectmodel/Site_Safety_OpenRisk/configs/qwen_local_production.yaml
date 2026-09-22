@@ -1,0 +1,166 @@
+project_name: Site Safety OpenRisk Production
+random_seed: 42
+
+risk_operators:
+  path: configs/risk_operators.yaml
+
+screening:
+  enabled: true
+  gate_camera: true
+  scheduled_full_audit_minutes: 30
+  allowed_full_audit_minutes: [30, 120]
+  full_audit_on_first_frame: false
+  device: 0
+  imgsz: 640
+  confidence: 0.25
+  iou: 0.70
+  trigger_threshold: 0.35
+  proximity_threshold: 0.08
+  # 原始检测完整保存到yolo_detections.json；给8K Qwen只传Top-8区域。
+  max_regions: 8
+  calibration_version: combine-yolo-v1
+  models:
+    - name: yolo26m_css_v28
+      weights: ../../../yolo_site_workspace_portable/weights/yolo26m_css_v28_baseline_best.pt
+    - name: yolo26m_construction_site
+      weights: ../../../yolo_site_workspace_portable/weights/yolo26m_construction_site_best.pt
+
+mllm:
+  backend: openai_compatible
+  api_key_env: LOCAL_QWEN_API_KEY
+  base_url_env: LOCAL_QWEN_BASE_URL
+  model_env: LOCAL_QWEN_MODEL
+  timeout_seconds: 900
+  max_retries: 1
+  temperature: 0.0
+  trust_env: false
+  use_response_format: false
+  payload_extra:
+    max_tokens: 1800
+  system_prompt: >-
+    你是一名谨慎的施工现场视觉安全分析助手。只根据输入图像中的可见证据判断，
+    不推测设备运行状态、人员权限、施工阶段或不可见信息。输出必须是严格JSON。
+
+report_llm:
+  enabled: false
+  backend: openai_compatible
+  generated_by: qwen_local
+  api_key_env: LOCAL_QWEN_API_KEY
+  base_url_env: LOCAL_QWEN_BASE_URL
+  model_env: LOCAL_QWEN_MODEL
+  timeout_seconds: 900
+  max_retries: 0
+  temperature: 0.1
+  payload_extra:
+    max_tokens: 1200
+  use_response_format: false
+  trust_env: false
+  memory_paths:
+    - examples/risk_catalog.json
+
+sam3:
+  backend: bridge
+  bridge_module: integrations.sam3_bridge_user
+  bridge_class: SAM3Bridge
+  init_kwargs:
+    repo_path: '../../../sam3-main'
+    checkpoint: '../../../weights/sam3.pt'
+    device: cuda
+    confidence_threshold: 0.20
+    amp_dtype: bfloat16
+
+# CLIP is an optional ROI/Mask semantic-consistency interface. It is disabled by
+# default so that the main MLLM + SAM3 path has no additional latency.
+clip:
+  enabled: false
+  minimum_consistency_score: 0.20
+
+risk_catalog:
+  path: examples/risk_catalog.json
+  include_all_core: true
+  distractor_count: 0
+  allow_open_discovery: true
+
+pipeline:
+  screening_region_views:
+    # 本地Qwen视觉上下文实测上限8192；全图+最高优先级ROI可避免多裁剪超限。
+    max_crops: 1
+    crop_margin_ratio: 0.25
+    include_mask_overlay: false
+  compact_open_discovery: true
+  two_stage_open_discovery: true
+  dual_view_open_discovery: true
+  structure_each_discovered_hazard: true
+  minimum_discovery_confidence: 0.25
+  # Only repair explicit fall-protection findings whose visible evidence also
+  # states that the harness/lanyard/anchor connection is missing.
+  fall_protection_confidence_recovery:
+    enabled: true
+    confidence: 0.60
+  retry_empty_anchor_scene: true
+  person_precheck:
+    enabled: true
+    prompt: person
+    min_score: 0.45
+    max_crops: 4
+    crop_margin_ratio: 0.25
+    upscale_min_side: 448
+  structured_risk_audit:
+    enabled: false
+  deterministic_candidate_fallbacks:
+    enabled: true
+    rules:
+      - risk_id: machinery_proximity
+        all_of_any:
+          - [挖掘机, 装载机, 推土机, 起重机, 重型机械, 工程机械]
+          - [工人, 人员, 人]
+        confidence: 0.60
+        uncertainty_message: 人员与重型机械在场景摘要中共现，仅作为候选入口，必须通过SAM3人员证据及机械外缘距离核验。
+      - risk_id: missing_edge_protection
+        all_of_any:
+          - [基坑, 深沟, 沟槽, 陡坡, 斜坡, 土坡, 洞口, 临边]
+        confidence: 0.60
+        uncertainty_message: 场景摘要出现明确临边或开口锚点，仅回填候选；必须通过SAM3危险区域和防护物缺失核验。
+      - risk_id: missing_edge_protection
+        all_of_any:
+          - [脚手架, 高处平台, 平台边缘]
+          - [工人, 人员, 作业]
+        confidence: 0.60
+        uncertainty_message: 脚手架或高处平台与作业人员共现，仅回填临边候选；必须核验平台边缘和护栏。
+  skip_second_pass_on_failed_relation: true
+  # Stable PPE and fall-protection operators can use deterministic evidence checks
+  # without repeating the same MLLM review. Fallen-person, machinery and open risks
+  # retain the second visual review.
+  second_pass_bypass_risk_ids:
+    - missing_helmet
+    - missing_edge_protection
+    - missing_fall_protection
+  segment_statuses: [present, uncertain]
+  min_mllm_candidate_confidence: 0.25
+  min_sam3_score: 0.20
+  max_sam3_tasks: 24
+  run_second_pass: true
+  save_entity_masks: true
+  save_risk_crops: true
+  second_pass_max_overlays: 1
+  second_pass_per_risk: true
+  strong_evidence_preservation:
+    enabled: true
+    min_first_pass_confidence: 0.85
+    min_evidence_score: 0.70
+  global_min_verified_confidence: 0.25
+  threshold_overrides_path: configs/threshold_overrides_eval_empty.json
+  relation_defaults:
+    horizontal_overlap_threshold: 0.25
+    near_distance_ratio: 0.30
+    near_edge_gap_machine_ratio: 0.35
+    near_min_subject_score: 0.35
+    overlap_threshold: 0.10
+    inside_threshold: 0.50
+    allow_missing_from_non_detection: false
+    allow_missing_from_visible_zone: true
+    confirmed_absence_confidence_cap: 0.90
+  mask_defaults:
+    projected_width_expand_ratio: 0.15
+    projected_max_object_height_ratio: 4.0
+    projected_max_image_height_ratio: 0.55

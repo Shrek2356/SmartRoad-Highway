@@ -1,0 +1,179 @@
+{
+  "_comment": "道路实验室风险目录；只记录可见异常线索，所有模型发现需业务复核。目录不是已验证的识别能力清单。",
+  "core": [
+    {
+      "risk_id": "pothole",
+      "name_zh": "路面坑槽",
+      "description": "路面出现坑洞、坑槽或剥落成坑的破损区域。",
+      "entity_hints": [
+        "road surface",
+        "pothole on road surface"
+      ],
+      "relation_hint": "inside",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "DamageCore"
+    },
+    {
+      "risk_id": "crack",
+      "name_zh": "路面裂缝",
+      "description": "路面存在线状裂缝、网状龟裂或块状开裂。",
+      "entity_hints": [
+        "road surface",
+        "crack on road pavement"
+      ],
+      "relation_hint": "inside",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "DamageCore"
+    },
+    {
+      "risk_id": "subsidence",
+      "name_zh": "路面沉陷变形",
+      "description": "路面出现明显沉陷、隆起、车辙或波浪状变形。",
+      "entity_hints": [
+        "road surface",
+        "sunken or deformed road surface area"
+      ],
+      "relation_hint": "inside",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "DamageCore"
+    },
+    {
+      "risk_id": "road_collapse",
+      "name_zh": "路基塌方缺口",
+      "description": "路面或路基整体塌陷、缺失、断裂形成的大范围破坏。",
+      "entity_hints": [
+        "road surface",
+        "collapsed road section or missing roadbed"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "DamageCore"
+    },
+    {
+      "risk_id": "water_accumulation",
+      "name_zh": "路面积水",
+      "description": "明确积聚的水体、成片淹没车道或横向漫流；需有水体边界、明显涉水或覆盖车道等直接证据。雨后湿润、反光、薄水膜不属于异常。",
+      "entity_hints": [
+        "road surface",
+        "water puddle on road surface"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "ConnectedHazard"
+    },
+    {
+      "risk_id": "rockfall_on_road",
+      "name_zh": "路面落石",
+      "description": "山体或边坡滚落的石块滞留在路面或路肩上。",
+      "entity_hints": [
+        "road surface",
+        "fallen rocks on road"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "ConnectedHazard"
+    },
+    {
+      "risk_id": "slope_debris",
+      "name_zh": "边坡滑塌堆积物",
+      "description": "路侧边坡滑塌产生的土石堆积物侵入路面或紧贴路缘。",
+      "entity_hints": [
+        "road surface",
+        "landslide debris pile beside or on road"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "ConnectedHazard"
+    },
+    {
+      "risk_id": "road_debris",
+      "name_zh": "路面散落异物",
+      "description": "路面散落建筑垃圾、货物、树枝等异物。",
+      "entity_hints": [
+        "road surface",
+        "debris or foreign objects scattered on road"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only",
+      "annotation_class": "ConnectedHazard"
+    },
+    {
+      "risk_id": "road_obstruction",
+      "name_zh": "道路阻塞",
+      "description": "车辆、拖车、树木等具体物体疑似侵入道路；区分路外停放与占道。",
+      "entity_hints": [
+        "road surface",
+        "specific object obstructing road"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "sediment_cover",
+      "name_zh": "泥沙颗粒物覆盖",
+      "description": "道路被泥浆、沙土或颗粒物覆盖；不自动等同积水。",
+      "entity_hints": [
+        "road surface",
+        "mud or sediment covering road"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "road_condition_anomaly",
+      "name_zh": "道路状况异常",
+      "description": "可见道路表面或边缘异常但无法细分为坑槽、裂缝或修补。",
+      "entity_hints": [
+        "road surface",
+        "visible irregular road surface area"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "vehicle_fire",
+      "name_zh": "车辆或路侧疑似火情",
+      "description": "车辆或道路周边存在火焰、烟雾迹象；烟雾需与蒸汽、扬尘区分，火情位置与道路影响分别核对。",
+      "entity_hints": [
+        "road surface",
+        "flames or smoke from a vehicle"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "traffic_collision",
+      "name_zh": "疑似交通事故或车辆侧翻",
+      "description": "可见车辆侧翻、相互接触伴破损、碰撞后碎片等异常；静止车辆不直接等于事故。",
+      "entity_hints": [
+        "road surface",
+        "overturned or visibly damaged vehicle"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "traffic_facility_damage",
+      "name_zh": "交通设施损坏",
+      "description": "可见护栏断裂变形、标志倒伏损坏等；不能仅因画面未显示设施而推定缺失。",
+      "entity_hints": [
+        "road surface",
+        "damaged roadside barrier or fallen traffic sign"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    },
+    {
+      "risk_id": "road_intrusion",
+      "name_zh": "行人或动物侵入道路",
+      "description": "行人或动物进入可见行车区域；区分路外和养护作业区域，不从服装认定人员身份。",
+      "entity_hints": [
+        "road surface",
+        "person or animal on road carriageway"
+      ],
+      "relation_hint": "overlap",
+      "mask_strategy_hint": "object_only"
+    }
+  ],
+  "distractors": []
+}

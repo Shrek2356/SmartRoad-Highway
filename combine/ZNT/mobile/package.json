@@ -1,0 +1,20 @@
+{
+  "name": "znt-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "路安智巡 - 道路值班移动端",
+  "scripts": {
+    "dev": "vite --port 5175",
+    "build": "vite build",
+    "preview": "vite preview --port 5175"
+  },
+  "dependencies": {
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^5.4.11"
+  }
+}

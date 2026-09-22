@@ -1,0 +1,16 @@
+{
+  "qwen_enabled": true,
+  "qwen_autostart": false,
+  "yolo_enabled": false,
+  "sam3_enabled": true,
+  "clip_enabled": false,
+  "llama_server_path": "../../third_party/llama.cpp/llama-server.exe",
+  "qwen_model_path": "../../models/qwen/Qwen3-VL-8B-Instruct-Q4_K_M.gguf",
+  "qwen_mmproj_path": "../../models/qwen/mmproj-BF16.gguf",
+  "qwen_base_url": "http://127.0.0.1:8080/v1/chat/completions",
+  "sam3_repo_path": "../../third_party/sam3-main",
+  "sam3_checkpoint_path": "../../models/sam3/sam3.pt",
+  "clip_checkpoint_path": "../../models/clip/ViT-L-14.pt",
+  "yolo_css_weights_path": "",
+  "yolo_construction_weights_path": ""
+}

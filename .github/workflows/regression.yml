@@ -1,0 +1,32 @@
+name: Desktop and platform regression
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  windows-regression:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: combine/ZNT
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: combine/ZNT/pc-admin/package-lock.json
+      - name: Install test dependencies
+        run: python -m pip install -r requirements/test.txt
+      - name: Frontend install, tests and build
+        working-directory: combine/ZNT/pc-admin
+        run: |
+          npm ci
+          npm test
+          npm run build
+      - name: Backend and real desktop gateway tests (no model weights)
+        working-directory: combine/ZNT/detectmodel/Site_Safety_OpenRisk
+        run: python -m pytest tests ../../desktop/tests -q

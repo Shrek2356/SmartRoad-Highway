@@ -1,0 +1,5 @@
+# Development/CI only. Not required in a user's portable demo environment.
+-r detect-bridge.txt
+pytest==8.4.2
+opencv-python-headless==4.14.0.94
+pywebview==6.1

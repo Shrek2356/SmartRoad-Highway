@@ -1,0 +1,212 @@
+version: 1
+operators:
+  pothole:
+    name_zh: 路面坑槽
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: pothole on road surface
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  crack:
+    name_zh: 路面裂缝
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: crack on road pavement
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  subsidence:
+    name_zh: 路面沉陷变形
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: sunken or deformed road surface area
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  road_collapse:
+    name_zh: 路基塌方缺口
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: collapsed road section or missing roadbed
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  water_accumulation:
+    name_zh: 路面积水
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: water puddle on road surface
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  rockfall_on_road:
+    name_zh: 路面落石
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: fallen rocks on road
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  slope_debris:
+    name_zh: 边坡滑塌堆积物
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: landslide debris pile beside or on road
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  road_debris:
+    name_zh: 路面散落异物
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: debris or foreign objects scattered on road
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  road_obstruction:
+    name_zh: 道路阻塞
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: specific object obstructing road
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  sediment_cover:
+    name_zh: 泥沙颗粒物覆盖
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: mud or sediment covering road
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  road_condition_anomaly:
+    name_zh: 道路状况异常
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: visible irregular road surface area
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  vehicle_fire:
+    name_zh: 车辆或路侧疑似火情
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: flames or smoke from a vehicle
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  traffic_collision:
+    name_zh: 疑似交通事故或车辆侧翻
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: overturned or visibly damaged vehicle
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  traffic_facility_damage:
+    name_zh: 交通设施损坏
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: damaged roadside barrier or fallen traffic sign
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false
+  road_intrusion:
+    name_zh: 行人或动物侵入道路
+    tasks:
+    - role: subject
+      prompt: road surface
+      expected_count: 1
+    - role: hazard_source
+      prompt: person or animal on road carriageway
+      expected_count: 4
+    relation:
+      type: overlap
+      task_scope: all
+    mask_strategy: object_only
+    force_canonical_tasks: false

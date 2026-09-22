@@ -1,0 +1,13 @@
+# 文档索引
+
+- [ARCHITECTURE_NOTES.md](./ARCHITECTURE_NOTES.md)：系统架构与模块边界。
+- [MODELS_AND_TOOLS.md](./MODELS_AND_TOOLS.md)：模型和工具职责。
+- [AGENT_PROTOCOL.md](./AGENT_PROTOCOL.md)：视觉事实到Agent的数据协议。
+- [AGENT_REGISTRY.md](./AGENT_REGISTRY.md)：Agent职责和注册表。
+- [SCREENING_TRIGGER_PROTOCOL.md](./SCREENING_TRIGGER_PROTOCOL.md)：实时初筛输入协议。
+- [RISK_OPERATOR_REGISTRY.md](./RISK_OPERATOR_REGISTRY.md)：风险算子定义。
+- [DEPLOYMENT.md](./DEPLOYMENT.md)：部署与运行。
+- [DELIVERY_GUIDE.md](./DELIVERY_GUIDE.md)：交付和接口说明。
+- [INTEGRATION_CHECKLIST.md](./INTEGRATION_CHECKLIST.md)：整合检查清单。
+
+比赛包不包含历史实验日志、调参批次和已淘汰版本材料。

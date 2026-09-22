@@ -1,0 +1,16 @@
+{
+  "samples": 15,
+  "success": 15,
+  "failure": 0,
+  "final_risks": 17,
+  "active_risk_overlays": 17,
+  "machine_supported": 7,
+  "localization_consistent": 7,
+  "normal_candidate_green": 5,
+  "all_green": 6,
+  "dismissed_candidates": 3,
+  "seconds_total": 254.93,
+  "seconds_mean": 17.0,
+  "scope": "Development diagnostic: 10 synthetic highway images and 5 UA-DETRAC normal candidates; not accuracy measurement.",
+  "mock": false
+}

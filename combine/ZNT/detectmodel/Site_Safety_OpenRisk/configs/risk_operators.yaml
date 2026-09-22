@@ -1,0 +1,168 @@
+version: 1
+
+# 风险算子把“MLLM语义描述”编译为“SAM3实体任务 + 几何关系 + 掩码策略”。
+# 新增已知风险时优先在此注册，不修改 orchestrator.py。
+operators:
+  missing_helmet:
+    name_zh: 施工人员未佩戴安全帽
+    tasks:
+      - {role: subject, prompt: construction worker, expected_count: 1}
+      - {role: protective_item, prompt: safety helmet, expected_count: 1}
+    relation:
+      type: missing_association
+      task_scope: all
+    mask_strategy: unmatched_subject
+
+  worker_under_suspended_load:
+    name_zh: 人员位于悬吊物下方
+    tasks:
+      - {role: subject, prompt: construction worker near or under suspended load, expected_count: 6}
+      - {role: hazard_source, prompt: suspended construction load, expected_count: 1}
+    relation:
+      type: below_and_horizontal_overlap
+      task_scope: canonical
+    mask_strategy: projected_below
+    force_canonical_tasks: true
+    promotion:
+      summary_all_of_any:
+        - [吊起, 悬吊, 吊装, 起重]
+        - [工人, 人员]
+      target_status: uncertain
+      min_confidence: 0.60
+      uncertainty_message: 场景同时出现悬吊物与人员，强制交由SAM3和几何关系模块核验。
+
+  fallen_worker:
+    name_zh: 人员倒地
+    tasks:
+      - {role: subject, prompt: person lying on construction ground, expected_count: 1}
+    mask_strategy: subject_only
+
+  blocked_passage:
+    name_zh: 通道堵塞
+    tasks:
+      - {role: subject, prompt: construction materials or obstacles, expected_count: 4}
+      - {role: region, prompt: construction passage or walking path, expected_count: 1}
+    relation:
+      type: blocks_region
+      task_scope: canonical
+    mask_strategy: intersection
+    force_canonical_tasks: true
+
+  smoke_or_fire:
+    name_zh: 烟雾或火情
+    tasks:
+      - {role: evidence, prompt: smoke or fire at construction site, expected_count: 1}
+    mask_strategy: entity_union
+
+  missing_edge_protection:
+    name_zh: 临边或洞口防护缺失
+    tasks:
+      - {role: subject, prompt: visible construction edge or floor opening, expected_count: 1}
+      - {role: protective_item, prompt: safety guardrail or opening cover, expected_count: 1}
+    relation:
+      type: missing
+      task_scope: all
+      # 临边/洞口本身是缺失检查主体，不是防护物。默认object_roles包含region会
+      # 把已定位的边缘误当作“已检测到护栏”，导致风险掩码无法生成。
+      subject_roles: [subject, region]
+      object_roles: [protective_item]
+      visibility_aware_missing: true
+    mask_strategy: missing_subject
+    force_canonical_tasks: true
+
+  missing_fall_protection:
+    name_zh: 高处作业防坠保护缺失
+    tasks:
+      - {role: subject, prompt: worker performing work at height, expected_count: 1}
+      - {role: protective_item, prompt: visible fall-arrest lanyard physically linking the worker body harness to a fixed structural anchor or lifeline, expected_count: 1, min_score: 0.50}
+    relation:
+      # Only the canonical lanyard task participates in the decision. MLLM may
+      # emit a broad "safety harness" task, but a worn harness alone does not
+      # prove that the fall-arrest system is anchored.
+      type: missing_association
+      task_scope: canonical
+      subject_roles: [subject]
+      object_roles: [protective_item]
+      params:
+        upper_body_ratio: 1.0
+      visibility_aware_missing: true
+    mask_strategy: missing_subject
+    force_canonical_tasks: true
+
+  machinery_proximity:
+    name_zh: 人机距离过近
+    tasks:
+      - {role: subject, prompt: construction worker, expected_count: 1}
+      - {role: hazard_source, prompt: excavator or heavy construction machinery, expected_count: 1}
+    relation:
+      type: near
+      task_scope: all
+    mask_strategy: expanded_object_zone
+
+  collapsed_scaffold:
+    name_zh: 脚手架变形或坍塌
+    tasks:
+      - {role: evidence, prompt: damaged deformed or collapsed scaffold, expected_count: 1}
+    mask_strategy: entity_union
+
+  electrical_cable_on_wet_floor:
+    name_zh: 电缆与湿地面接触
+    tasks:
+      - {role: subject, prompt: electrical cables on construction floor, expected_count: 1}
+      - {role: region, prompt: wet construction floor or standing water, expected_count: 1}
+    relation:
+      type: overlap
+      task_scope: canonical
+    mask_strategy: entity_union
+    force_canonical_tasks: true
+
+  unsafe_scaffold_platform:
+    name_zh: 脚手架平台不完整
+    tasks:
+      - {role: evidence, prompt: unsafe scaffold platform with missing planks or guardrail, expected_count: 1}
+    mask_strategy: entity_union
+    promotion:
+      facts_any: [跳板, 踏板, 平台开口, 护栏缺失]
+      only_status: uncertain
+      min_confidence: 0.50
+      uncertainty_message: 观察到脚手架平台构件线索，交由SAM3逐风险核验完整性。
+
+discovery_retry_anchors:
+  - all_of_any:
+      - [吊装, 吊物, 悬吊, 起重]
+      - [工人, 人员]
+  - all_of_any:
+      - [脚手架]
+      - [工人, 人员, 作业]
+  - all_of_any:
+      - [高处, 临边, 洞口]
+      - [工人, 人员, 作业]
+
+# 兼容开放发现：按从具体到一般的顺序匹配。
+open_discovery_rules:
+  - rule_id: electrical_on_wet_floor
+    all_of_any:
+      - [电线, 电缆, 触电]
+      - [湿滑, 积水, 潮湿]
+    tasks:
+      - {role: subject, prompt: electrical cables on construction floor}
+      - {role: region, prompt: wet construction floor or standing water}
+    relation:
+      type: overlap
+      task_scope: canonical
+    mask_strategy: entity_union
+  - rule_id: electrical
+    match_any: [电线, 电缆, 触电]
+    tasks:
+      - {role: subject, prompt: electrical cables on construction floor}
+    mask_strategy: entity_union
+  - rule_id: wet_floor
+    match_any: [湿滑, 积水, 潮湿]
+    tasks:
+      - {role: region, prompt: wet construction floor or standing water}
+    mask_strategy: entity_union
+  - rule_id: unsafe_scaffold
+    match_any: [脚手架, 踏板, 跳板, 护栏]
+    tasks:
+      - {role: evidence, prompt: unsafe scaffold platform with missing planks or guardrail}
+    mask_strategy: entity_union

@@ -1,0 +1,14 @@
+{
+  "total_events": 1,
+  "events_with_anomaly": 1,
+  "risk_level_distribution": {
+    "critical": 1,
+    "pending_review": 1
+  },
+  "verified_risk_distribution": {
+    "人员异常倒地": 1
+  },
+  "work_orders_created": 1,
+  "pending_confirmations": 1,
+  "notifications_enqueued": 1
+}

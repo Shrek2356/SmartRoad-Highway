@@ -1,0 +1,4 @@
+# ZNT 完整本地检测依赖入口。
+# 请先安装与本机 NVIDIA 驱动匹配的 CUDA 版 PyTorch / torchvision，
+# 再在 ZNT 根目录执行：python -m pip install -r requirements.txt
+-r requirements/detect-full.txt

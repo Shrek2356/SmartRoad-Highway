@@ -1,0 +1,83 @@
+project_name: Site Safety OpenRisk Training-Free
+random_seed: 42
+
+risk_operators:
+  path: configs/risk_operators.yaml
+
+mllm:
+  backend: mock
+  api_key_env: MLLM_API_KEY
+  base_url_env: MLLM_BASE_URL
+  model_env: MLLM_MODEL
+  timeout_seconds: 120
+  temperature: 0.1
+  use_response_format: true
+  system_prompt: >-
+    你是一名谨慎的施工现场视觉安全分析助手。只根据图像中可见证据判断，
+    不推测设备运行状态、人员权限、施工阶段或不可见信息。输出必须是严格JSON。
+
+report_llm:
+  enabled: false
+  backend: openai_compatible
+  api_key_env: GLM_API_KEY
+  base_url_env: GLM_BASE_URL
+  model_env: GLM_MODEL
+  timeout_seconds: 120
+  temperature: 0.1
+  use_response_format: true
+  memory_paths:
+    - examples/risk_catalog.json
+  system_prompt: >-
+    你负责记忆库检索、报告整理和管理建议。视觉核验JSON是唯一视觉事实来源，
+    不得改变风险是否成立、置信度、可见证据和人工复核要求。
+
+sam3:
+  backend: bridge
+  bridge_module: integrations.sam3_bridge_user
+  bridge_class: SAM3Bridge
+  init_kwargs:
+    repo_path: 'k:/ZNT/sam3-main'
+    checkpoint: 'k:/ZNT/sam3.pt'
+    device: cuda
+    confidence_threshold: 0.20
+    amp_dtype: bfloat16
+
+clip:
+  enabled: true
+  backend: bridge
+  bridge_module: integrations.clip_bridge_user
+  bridge_class: CLIPBridge
+  init_kwargs:
+    model_name: ViT-L-14
+    checkpoint: 'k:/ZNT/ViT-L-14.pt'
+    device: cuda
+    precision: fp16
+  minimum_consistency_score: 0.20
+
+risk_catalog:
+  path: examples/risk_catalog.json
+  include_all_core: true
+  distractor_count: 3
+  allow_open_discovery: true
+
+pipeline:
+  segment_statuses: [present, uncertain]
+  min_mllm_candidate_confidence: 0.25
+  min_sam3_score: 0.20
+  max_sam3_tasks: 24
+  run_second_pass: true
+  save_entity_masks: true
+  save_risk_crops: true
+  second_pass_max_overlays: 6
+  relation_defaults:
+    horizontal_overlap_threshold: 0.25
+    near_distance_ratio: 0.30
+    overlap_threshold: 0.10
+    inside_threshold: 0.50
+    allow_missing_from_non_detection: false
+    allow_missing_from_visible_zone: true
+    confirmed_absence_confidence_cap: 0.90
+  mask_defaults:
+    projected_width_expand_ratio: 0.15
+    projected_max_object_height_ratio: 4.0
+    projected_max_image_height_ratio: 0.55

@@ -1,0 +1,21 @@
+[
+  {
+    "schema_version": "1.0",
+    "request_id": "CR-20260809-0b2aa26b",
+    "event_id": "EVT-20260809-5d0c261a",
+    "risk_id": "missing_edge_protection",
+    "risk_name_zh": "临边防护缺失",
+    "reason": "脚手架或高处平台与作业人员共现，仅回填临边候选；必须核验平台边缘和护栏。；关键实体未被SAM3定位。；仅未观察到防护物，尚未形成可见区域内的确认缺失证据。",
+    "model_verified": false,
+    "model_confidence": 0.35,
+    "model_judgment": "未获得足够的实体定位证据，当前无法自动确认该风险。",
+    "visible_evidence": [],
+    "counter_evidence": [],
+    "absence_status": "not_observed",
+    "crop_path": null,
+    "overlay_path": null,
+    "image_path": "pc-admin/public/examples/case8.png",
+    "created_at": "2026-08-09T03:14:22-07:00",
+    "status": "pending"
+  }
+]

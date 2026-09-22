@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>道路风险智能体调试界面</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #171e2e; --panel2: #1e2740; --line: #2a3552;
+    --text: #e6ebf5; --muted: #8fa0c0;
+    --critical: #ff5c5c; --major: #ffab40; --general: #ffe066; --review: #6ec6ff; --info: #7a879f;
+    --ok: #4cd97b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: "Microsoft YaHei", system-ui, sans-serif; }
+  header { display:flex; align-items:center; gap:16px; padding:14px 22px; background:var(--panel); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5;}
+  header h1 { font-size:18px; font-weight:600; }
+  header .sub { color: var(--muted); font-size:12px; }
+  nav { display:flex; gap:6px; margin-left:auto; }
+  nav button { background:transparent; border:1px solid var(--line); color:var(--muted); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; }
+  nav button.active { background:var(--panel2); color:var(--text); border-color:#3b4a75; }
+  main { padding:20px 22px; max-width:1280px; margin:0 auto; }
+  .grid { display:grid; gap:14px; }
+  .cards { grid-template-columns:repeat(auto-fill, minmax(360px,1fr)); }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .card .img-wrap { position:relative; background:#000; height:210px; display:flex; align-items:center; justify-content:center; }
+  .card img { max-width:100%; max-height:100%; object-fit:contain; }
+  .card .body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+  .row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .tag { font-size:12px; padding:2px 10px; border-radius:20px; font-weight:600; }
+  .tag.critical { background:rgba(255,92,92,.15); color:var(--critical); border:1px solid var(--critical); }
+  .tag.major { background:rgba(255,171,64,.15); color:var(--major); border:1px solid var(--major); }
+  .tag.general { background:rgba(255,224,102,.12); color:var(--general); border:1px solid var(--general); }
+  .tag.pending_review { background:rgba(110,198,255,.12); color:var(--review); border:1px solid var(--review); }
+  .tag.mode { background:var(--panel2); color:var(--muted); border:1px solid var(--line); }
+  .title { font-size:15px; font-weight:600; }
+  .meta { color:var(--muted); font-size:12px; line-height:1.6; }
+  .reg { font-size:12px; color:#b8c6e6; background:var(--panel2); border-left:3px solid var(--review); padding:6px 8px; border-radius:4px; }
+  .sla { font-size:12px; font-weight:600; }
+  .sla.overdue { color:var(--critical); }
+  .sla.ok { color:var(--ok); }
+  .btns { display:flex; gap:8px; margin-top:4px; }
+  button.act { border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; font-weight:600; }
+  .confirm { background:var(--ok); color:#08331a; }
+  .reject { background:rgba(255,92,92,.9); color:#fff; }
+  .next { background:var(--panel2); color:var(--text); border:1px solid #3b4a75 !important; }
+  table { width:100%; border-collapse:collapse; background:var(--panel); border-radius:12px; overflow:hidden; font-size:13px; }
+  th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); }
+  th { background:var(--panel2); color:var(--muted); font-weight:600; }
+  .stat-row { grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .stat .num { font-size:30px; font-weight:700; }
+  .stat .lbl { color:var(--muted); font-size:13px; margin-top:4px; }
+  .bars { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .bars h3 { font-size:14px; margin-bottom:12px; color:var(--muted); }
+  .bar-item { display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px; }
+  .bar-item .name { width:180px; color:var(--text); }
+  .bar-track { flex:1; background:var(--panel2); border-radius:4px; height:18px; }
+  .bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#4a7dff,#6ec6ff); min-width:2px; }
+  .bar-item .val { width:36px; text-align:right; color:var(--muted); }
+  .empty { color:var(--muted); padding:40px; text-align:center; }
+  pre.brief { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; white-space:pre-wrap; font-family:inherit; line-height:1.8; font-size:14px; }
+  .toast { position:fixed; bottom:24px; right:24px; background:var(--panel2); border:1px solid #3b4a75; color:var(--text); padding:12px 18px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:10; }
+  .toast.show { opacity:1; }
+  select, input[type=text] { background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:6px 8px; font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🛣️ 道路风险智能体调试界面</h1>
+  <span class="sub" id="data-mode-tag">数据源加载中…</span>
+  <select id="site-filter" title="站点筛选"><option value="">全部站点</option></select>
+  <nav>
+    <button data-tab="alerts" class="active">实时告警</button>
+    <button data-tab="review">待复核 <span id="review-badge"></span></button>
+    <button data-tab="orders">工单管理</button>
+    <button data-tab="stats">统计分析</button>
+    <button data-tab="briefing">班前交底</button>
+    <button data-tab="sites">站点设备</button>
+    <button data-tab="config">系统配置</button>
+  </nav>
+</header>
+<main>
+  <section id="tab-alerts" class="grid cards"></section>
+  <section id="tab-review" class="grid cards" hidden></section>
+  <section id="tab-orders" hidden></section>
+  <section id="tab-stats" hidden></section>
+  <section id="tab-briefing" hidden></section>
+  <section id="tab-sites" hidden></section>
+  <section id="tab-config" hidden></section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const LEVEL_ORDER = { critical: 0, major: 1, general: 2, pending_review: 3, info: 4 };
+const STATUS_ZH = {
+  pending_confirmation: "待确认", confirmed: "已确认", assigned: "已派单",
+  rectifying: "整改中", rectified: "已整改", closed: "已关闭", rejected_false_alarm: "误报驳回",
+};
+let DB = { events: [], orders: [], confirmations: [], transitions: {} };
+let SITE = "";  // 全局站点筛选，空=全部
+function bySite(ev) { return !SITE || ev.device.site_id === SITE; }
+
+const $ = (sel) => document.querySelector(sel);
+function toast(msg) {
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2600);
+}
+function media(path) { return path ? `/media?path=${encodeURIComponent(path)}` : ""; }
+let AUTH = { enabled: false, token: localStorage.getItem("safety_token") || "", user: null };
+async function api(path, options) {
+  const opts = options || {};
+  if (AUTH.enabled && AUTH.token) {
+    opts.headers = Object.assign({}, opts.headers, { "Authorization": "Bearer " + AUTH.token });
+  }
+  const res = await fetch(path, opts);
+  if (res.status === 401 && AUTH.enabled) { showLogin(); throw new Error("请先登录"); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || data.detail || res.status);
+  return data;
+}
+
+/* ---------- 鉴权引导（正式后端有登录；演示后端自动跳过） ---------- */
+async function bootstrapAuth() {
+  try {
+    const res = await fetch("/api/whoami", AUTH.token
+      ? { headers: { "Authorization": "Bearer " + AUTH.token } } : {});
+    if (res.status === 401) { AUTH.enabled = true; showLogin(); return false; }
+    if (res.ok) {
+      const info = await res.json();
+      if (info.username) { AUTH.enabled = true; AUTH.user = info; showUserBadge(); }
+      return true;
+    }
+    return true; // 404等：演示后端无鉴权
+  } catch { return true; }
+}
+function showUserBadge() {
+  let el = document.getElementById("user-badge");
+  if (!el) {
+    el = document.createElement("span");
+    el.id = "user-badge"; el.className = "sub";
+    $("#site-filter").before(el);
+  }
+  const roleZh = { admin: "管理员", safety_officer: "道路值班员", viewer: "访客" };
+  el.innerHTML = `👤 ${AUTH.user.username}（${roleZh[AUTH.user.role] || AUTH.user.role}） <a href="#" onclick="logout();return false" style="color:var(--review)">退出</a>`;
+}
+function logout() { localStorage.removeItem("safety_token"); location.reload(); }
+function showLogin() {
+  if (document.getElementById("login-overlay")) return;
+  const div = document.createElement("div");
+  div.id = "login-overlay";
+  div.style.cssText = "position:fixed;inset:0;background:#000d;z-index:100;display:flex;align-items:center;justify-content:center";
+  div.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;width:320px">
+    <h2 style="font-size:16px;margin-bottom:16px">🛣️ 登录道路风险系统</h2>
+    <input id="lg-user" type="text" placeholder="用户名" style="width:100%;margin-bottom:10px">
+    <input id="lg-pass" type="password" placeholder="密码" style="width:100%;margin-bottom:14px">
+    <button class="act confirm" style="width:100%" onclick="doLogin()">登录</button>
+    <div class="meta" style="margin-top:10px">演示账号：admin/safety/viewer（密码=账号+123）</div>
+    <div id="lg-err" class="meta" style="color:var(--critical);margin-top:6px"></div></div>`;
+  document.body.appendChild(div);
+  div.querySelector("#lg-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+}
+async function doLogin() {
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: $("#lg-user").value, password: $("#lg-pass").value }),
+    });
+    const data = await res.json();
+    if (!res.ok) { document.getElementById("lg-err").textContent = data.detail || "登录失败"; return; }
+    AUTH.token = data.token; AUTH.user = data; AUTH.enabled = true;
+    localStorage.setItem("safety_token", data.token);
+    document.getElementById("login-overlay").remove();
+    showUserBadge(); connectWS(); loadAll();
+  } catch (err) { document.getElementById("lg-err").textContent = String(err); }
+}
+function connectWS() {
+  if (!AUTH.enabled || !AUTH.token) return;
+  try {
+    const ws = new WebSocket(`ws://${location.host}/ws?token=${AUTH.token}`);
+    ws.onmessage = () => loadAll();
+    ws.onclose = () => setTimeout(connectWS, 5000);
+    setInterval(() => { if (ws.readyState === 1) ws.send("ping"); }, 30000);
+  } catch { /* 演示后端无ws */ }
+}
+async function loadAll() {
+  const [events, orders, confirmations, transitions] = await Promise.all([
+    api("/api/events"), api("/api/work_orders"), api("/api/confirmations"), api("/api/transitions"),
+  ]);
+  DB = { events, orders, confirmations, transitions };
+  const modes = new Set(events.map((e) => e.data_mode));
+  const sites = [...new Set(events.map((e) => e.device.site_id))].sort();
+  $("#data-mode-tag").textContent =
+    `${events.length}个事件 · 数据模式:${[...modes].join("/") || "-"} · ${sites.length}个站点`;
+  const sel = $("#site-filter");
+  const current = sel.value;
+  sel.innerHTML = `<option value="">全部站点</option>` +
+    sites.map((s) => `<option value="${s}">${s}</option>`).join("");
+  sel.value = sites.includes(current) ? current : "";
+  SITE = sel.value;
+  const pending = confirmations.filter((c) => c.status === "pending").length;
+  $("#review-badge").textContent = pending ? `(${pending})` : "";
+  renderAlerts(); renderReview(); renderOrders(); renderStats(); renderBriefing(); renderSites(); renderConfig();
+}
+
+/* ---------- 实时告警 ---------- */
+function slaHtml(order) {
+  if (!order || !order.due_at) return "";
+  const remain = (new Date(order.due_at) - Date.now()) / 36e5;
+  const done = ["rectified", "closed"].includes(order.status);
+  if (done) return `<span class="sla ok">整改完成</span>`;
+  return remain < 0
+    ? `<span class="sla overdue">已逾期 ${Math.abs(remain).toFixed(1)} 小时</span>`
+    : `<span class="sla ok">SLA剩余 ${remain.toFixed(1)} 小时</span>`;
+}
+function renderAlerts() {
+  const items = [];
+  for (const ev of DB.events.filter(bySite)) for (const r of ev.risks) {
+    if (r.verified && ["critical", "major", "general"].includes(r.risk_level)) items.push({ ev, r });
+  }
+  items.sort((a, b) => LEVEL_ORDER[a.r.risk_level] - LEVEL_ORDER[b.r.risk_level]);
+  const box = $("#tab-alerts");
+  if (!items.length) { box.innerHTML = `<div class="empty">暂无告警</div>`; return; }
+  box.innerHTML = items.map(({ ev, r }) => {
+    const order = DB.orders.find((o) => o.work_order_id === r.work_order_id);
+    const img = r.geometry.overlay_path || r.geometry.crop_path || ev.media.image_path;
+    const regs = r.regulations.map((g) =>
+      `<div class="reg">📖 ${g.name_zh} ${g.clause}：${g.requirement_zh}</div>`).join("");
+    return `<div class="card">
+      <div class="img-wrap"><img loading="lazy" src="${media(img)}" alt="${r.risk_name_zh}"></div>
+      <div class="body">
+        <div class="row">
+          <span class="tag ${r.risk_level}">${r.risk_level_zh}</span>
+          <span class="tag mode">${ev.data_mode === "realtime" ? "实时" : "离线"}</span>
+          <span class="title">${r.risk_name_zh}</span>
+        </div>
+        <div class="meta">事件 ${ev.event_id} · 设备 ${ev.device.device_id} · 置信度 ${(r.confidence * 100).toFixed(0)}%<br>
+          检出 ${ev.time.detected_at || "-"}</div>
+        ${regs}
+        ${(r.disposal_recommendations || []).length ? `<div class="reg" style="border-left-color:var(--ok)">🛠 处置建议：${r.disposal_recommendations.join("；")}</div>` : ""}
+        <div class="row">${order ? `工单 ${order.work_order_id}（${STATUS_ZH[order.status]}）` : "无工单"} ${slaHtml(order)}</div>
+      </div></div>`;
+  }).join("");
+}
+
+/* ---------- 待复核 ---------- */
+function renderReview() {
+  const siteEvents = new Set(DB.events.filter(bySite).map((e) => e.event_id));
+  const pending = DB.confirmations.filter((c) => c.status === "pending" && siteEvents.has(c.event_id));
+  const box = $("#tab-review");
+  if (!pending.length) { box.innerHTML = `<div class="empty">待复核队列已清空 ✅</div>`; return; }
+  box.innerHTML = pending.map((c) => {
+    // 三级兜底：叠加图 → 裁剪图 → 原图（契约image_path，老数据由事件反查）
+    const original = c.image_path || DB.events.find((e) => e.event_id === c.event_id)?.media.image_path;
+    const img = c.overlay_path || c.crop_path || original;
+    const noMask = !c.overlay_path && !c.crop_path;
+    const evidence = (c.visible_evidence || []).map((x) => `<li>${x}</li>`).join("");
+    const counter = (c.counter_evidence || []).map((x) => `<li>${x}</li>`).join("");
+    return `<div class="card">
+      <div class="img-wrap">${img ? `<img loading="lazy" src="${media(img)}">` : `<span class="meta">图像文件缺失</span>`}</div>
+      <div class="body">
+        <div class="row"><span class="tag pending_review">待人工复核</span>${noMask && img ? `<span class="tag mode">原图·无掩码定位</span>` : ""}<span class="title">${c.risk_name_zh}</span></div>
+        <div class="meta">${c.request_id} · 事件 ${c.event_id}<br>
+          模型置信度：${Number(c.model_confidence || 0).toFixed(3)} · 防护缺失状态：${c.absence_status || "not_applicable"}<br>
+          模型判断：${c.model_judgment || c.risk_name_zh}<br>
+          转人工原因：${c.reason}
+          ${evidence ? `<br>支持证据：<ul>${evidence}</ul>` : ""}
+          ${counter ? `<br>反证：<ul>${counter}</ul>` : ""}
+        </div>
+        <div class="row"><input type="text" id="cm-${c.request_id}" placeholder="备注（可选）" style="flex:1"></div>
+        <div class="btns">
+          <button class="act confirm" onclick="decide('${c.request_id}','confirmed')">✔ 确认属实</button>
+          <button class="act reject" onclick="decide('${c.request_id}','rejected')">✘ 驳回误报</button>
+        </div>
+      </div></div>`;
+  }).join("");
+}
+async function decide(requestId, verdict) {
+  try {
+    const comment = document.getElementById(`cm-${requestId}`)?.value || "";
+    const res = await api(`/api/confirmations/${requestId}/decide`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ verdict, reviewer: "safety_officer_demo", comment }),
+    });
+    toast(verdict === "confirmed"
+      ? `已确认，生成工单 ${res.work_order_id}` : "已驳回，误报案例已入库");
+    await loadAll();
+  } catch (err) { toast("操作失败：" + err.message); }
+}
+
+/* ---------- 工单管理 ---------- */
+function renderOrders() {
+  const box = $("#tab-orders");
+  const orders = DB.orders.filter((o) => !SITE || o.site_id === SITE);
+  if (!orders.length) { box.innerHTML = `<div class="empty">暂无工单</div>`; return; }
+  const rows = orders.map((o) => {
+    const nexts = (DB.transitions[o.status] || []);
+    const buttons = nexts.map((s) =>
+      `<button class="act next" onclick="transition('${o.work_order_id}','${s}')">→ ${STATUS_ZH[s]}</button>`).join(" ");
+    return `<tr>
+      <td>${o.work_order_id}</td>
+      <td><span class="tag ${o.risk_level}">${o.risk_level_zh}</span></td>
+      <td title="${(o.disposal_recommendations || []).join("&#10;")}">${o.risk_name_zh}${(o.disposal_recommendations || []).length ? " 🛠" : ""}</td>
+      <td>${STATUS_ZH[o.status]}</td>
+      <td>${o.assignee || "-"}</td>
+      <td class="meta">${o.due_at ? o.due_at.replace("T", " ").slice(0, 16) : "-"}</td>
+      <td>${buttons || "-"}</td></tr>`;
+  }).join("");
+  box.innerHTML = `<table><thead><tr>
+    <th>工单号</th><th>等级</th><th>风险</th><th>状态</th><th>负责人</th><th>整改期限</th><th>操作</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+}
+async function transition(orderId, toStatus) {
+  try {
+    const payload = { to_status: toStatus, by: "safety_officer_demo" };
+    if (toStatus === "assigned") payload.assignee = prompt("指派给（负责人）：", "王工长") || "王工长";
+    if (toStatus === "rejected_false_alarm") payload.note = prompt("驳回原因：", "现场核实为误报") || "";
+    await api(`/api/work_orders/${orderId}/transition`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    toast(`工单已流转至「${STATUS_ZH[toStatus]}」`); await loadAll();
+  } catch (err) { toast("流转失败：" + err.message); }
+}
+
+/* ---------- 统计分析 ---------- */
+function bars(title, dist, labelMap) {
+  const entries = Object.entries(dist || {});
+  if (!entries.length) return "";
+  const max = Math.max(...entries.map(([, v]) => v));
+  const items = entries.sort((a, b) => b[1] - a[1]).map(([k, v]) =>
+    `<div class="bar-item"><span class="name">${labelMap?.[k] || k}</span>
+     <div class="bar-track"><div class="bar-fill" style="width:${(v / max) * 100}%"></div></div>
+     <span class="val">${v}</span></div>`).join("");
+  return `<div class="bars"><h3>${title}</h3>${items}</div>`;
+}
+async function renderStats() {
+  const s = await api("/api/stats");
+  const levelZh = { critical: "重大风险", major: "较大风险", general: "一般风险", pending_review: "待复核", info: "提示" };
+  const fa = Object.values(s.false_alarm_stats || {});
+  const faHtml = fa.length ? `<div class="bars"><h3>人工复核回流：模型确认后被驳回比例</h3>
+    ${fa.map((x) => `<div class="bar-item"><span class="name">${x.risk_name_zh}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${x.false_alarm_rate * 100}%;background:linear-gradient(90deg,#ff5c5c,#ffab40)"></div></div>
+      <span class="val">${(x.false_alarm_rate * 100).toFixed(0)}%</span></div>`).join("")}</div>` : "";
+  const sugHtml = (s.threshold_suggestions || []).map((x) =>
+    `<div class="reg">💡 ${x.risk_name_zh}：${x.suggestion}（误报率${(x.false_alarm_rate * 100).toFixed(0)}%）</div>`).join("");
+  $("#tab-stats").innerHTML = `
+    <div class="grid stat-row" style="margin-bottom:14px">
+      <div class="stat"><div class="num">${s.total_events}</div><div class="lbl">检测事件总数</div></div>
+      <div class="stat"><div class="num" style="color:var(--major)">${s.events_with_anomaly}</div><div class="lbl">存在异常的事件</div></div>
+      <div class="stat"><div class="num" style="color:var(--review)">${s.pending_confirmations}</div><div class="lbl">待人工复核</div></div>
+      <div class="stat"><div class="num" style="color:var(--ok)">${s.work_orders_created}</div><div class="lbl">累计工单</div></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      ${bars("风险等级分布", s.risk_level_distribution, levelZh)}
+      ${bars("已确认风险类型", s.verified_risk_distribution)}
+      ${bars("工单状态", s.work_order_status, STATUS_ZH)}
+      ${faHtml}
+    </div>${sugHtml ? `<div style="margin-top:14px">${sugHtml}</div>` : ""}`;
+}
+
+/* ---------- 班前交底 ---------- */
+async function renderBriefing() {
+  const data = await api("/api/briefing");
+  $("#tab-briefing").innerHTML = `<pre class="brief">${data.markdown
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+}
+
+/* ---------- 站点设备 ---------- */
+async function renderSites() {
+  const sites = await api("/api/sites");
+  const box = $("#tab-sites");
+  if (!sites.length) { box.innerHTML = `<div class="empty">暂无站点数据</div>`; return; }
+  box.innerHTML = sites.map((s) => {
+    const devices = s.devices.map((d) =>
+      `<tr><td>${d.device_id}</td><td>${{fixed_camera:"固定摄像头",drone:"无人机",mobile:"手机",offline_upload:"离线上传"}[d.device_type] || d.device_type}</td>
+       <td>${d.data_modes.map((m) => m === "realtime" ? "实时" : "离线").join("/")}</td>
+       <td>${d.events}</td><td>${d.verified_risks}</td>
+       <td class="meta">${(d.last_detected_at || "-").replace("T", " ").slice(0, 16)}</td></tr>`).join("");
+    return `<div class="bars" style="margin-bottom:14px">
+      <h3>🛣️ ${s.site_id}</h3>
+      <div class="grid stat-row" style="margin-bottom:10px">
+        <div class="stat"><div class="num">${s.events}</div><div class="lbl">检测事件</div></div>
+        <div class="stat"><div class="num" style="color:var(--major)">${s.anomaly_events}</div><div class="lbl">异常事件</div></div>
+        <div class="stat"><div class="num" style="color:var(--ok)">${s.open_orders}</div><div class="lbl">在办工单</div></div>
+        <div class="stat"><div class="num" style="color:var(--critical)">${s.overdue_orders}</div><div class="lbl">逾期工单</div></div>
+      </div>
+      <table><thead><tr><th>设备</th><th>类型</th><th>模式</th><th>事件</th><th>确认风险</th><th>最近检测</th></tr></thead>
+      <tbody>${devices}</tbody></table></div>`;
+  }).join("");
+}
+
+/* ---------- 系统配置 ---------- */
+async function renderConfig() {
+  const cfg = await api("/api/config");
+  const slaRows = Object.entries(cfg.sla_hours).map(([k, v]) =>
+    `<tr><td><span class="tag ${k}">${{critical:"重大风险",major:"较大风险",general:"一般风险"}[k]}</span></td><td>${v} 小时</td><td>${(cfg.notify_targets[k]||[]).join("、")}</td></tr>`).join("");
+  $("#tab-config").innerHTML = `
+    <div class="grid stat-row" style="margin-bottom:14px">
+      <div class="stat"><div class="num">${cfg.regulation_count}</div><div class="lbl">规范条款数</div></div>
+      <div class="stat"><div class="num">${cfg.notify_channels.length}</div><div class="lbl">通知渠道：${cfg.notify_channels.join("/")}</div></div>
+      <div class="stat"><div class="num">${cfg.downgrade_threshold}</div><div class="lbl">等级降级置信度阈值</div></div>
+    </div>
+    <table style="margin-bottom:14px"><thead><tr><th>等级</th><th>整改SLA</th><th>通知对象</th></tr></thead><tbody>${slaRows}</tbody></table>
+    <div class="bars" style="margin-bottom:14px"><h3>阈值调整审批（复盘学习Agent建议 → 人工批准后生效）</h3>
+      <div id="proposal-list"></div></div>
+    <div class="bars" style="margin-bottom:14px"><h3>RAG知识库（把.md/.txt/.pdf/.docx规程文件放入 knowledge_base/ 目录即自动入库）</h3>
+      <div id="kb-summary" class="meta">加载中…</div></div>
+    <div id="user-mgmt"></div>
+    <div class="bars"><h3>规范知识库检索（精确+语义+文档知识库混合）</h3>
+      <div class="row" style="margin-bottom:10px"><input type="text" id="reg-q" placeholder="关键词，如：道路损毁 / 高速公路故障 / 第三十条" style="flex:1" onkeydown="if(event.key==='Enter')searchRegs()">
+      <button class="act next" onclick="searchRegs()">检索</button></div>
+      <div id="reg-results"></div></div>`;
+  searchRegs(); renderProposals(); renderKB(); renderUsers();
+}
+async function renderKB() {
+  try {
+    const kb = await api("/api/knowledge");
+    document.getElementById("kb-summary").innerHTML = kb.file_count
+      ? `已入库 <b>${kb.file_count}</b> 份文档 / <b>${kb.chunk_count}</b> 个条款块：${kb.files.map((f) => `📄${f}`).join("　")}`
+      : "目录为空——放入任意安全规程文件即可被条款级检索";
+  } catch { document.getElementById("kb-summary").textContent = "知识库不可用"; }
+}
+async function renderUsers() {
+  const box = document.getElementById("user-mgmt");
+  if (!box || !AUTH.enabled || AUTH.user?.role !== "admin") { if (box) box.innerHTML = ""; return; }
+  try {
+    const users = await api("/api/users");
+    const rows = users.map((u) => `<tr><td>${u.username}</td><td>${u.role}</td>
+      <td><button class="act next" onclick="resetPassword('${u.username}')">改密</button>
+      <button class="act next" onclick="changeRole('${u.username}','${u.role}')">改角色</button></td></tr>`).join("");
+    box.innerHTML = `<div class="bars" style="margin-bottom:14px"><h3>用户管理（仅管理员）</h3>
+      <table style="margin-bottom:10px"><thead><tr><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="row"><input type="text" id="nu-name" placeholder="新用户名"><input type="password" id="nu-pass" placeholder="密码">
+      <select id="nu-role"><option value="viewer">viewer</option><option value="safety_officer">safety_officer</option><option value="admin">admin</option></select>
+      <button class="act confirm" onclick="createUser()">新建用户</button></div></div>`;
+  } catch { box.innerHTML = ""; }
+}
+async function createUser() {
+  try {
+    await api("/api/users", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: $("#nu-name").value, password: $("#nu-pass").value, role: $("#nu-role").value }) });
+    toast("用户已创建"); renderUsers();
+  } catch (err) { toast("创建失败：" + err.message); }
+}
+async function resetPassword(name) {
+  const password = prompt(`为 ${name} 设置新密码：`);
+  if (!password) return;
+  try {
+    await api(`/api/users/${name}/password`, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }) });
+    toast("密码已更新");
+  } catch (err) { toast("失败：" + err.message); }
+}
+async function changeRole(name, current) {
+  const role = prompt(`为 ${name} 设置角色（viewer/safety_officer/admin）：`, current);
+  if (!role) return;
+  try {
+    await api(`/api/users/${name}/role`, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role }) });
+    toast("角色已更新"); renderUsers();
+  } catch (err) { toast("失败：" + err.message); }
+}
+async function searchRegs() {
+  const q = document.getElementById("reg-q")?.value || "";
+  const hits = await api(`/api/regulations?q=${encodeURIComponent(q)}`);
+  document.getElementById("reg-results").innerHTML = hits.length
+    ? hits.map((h) => {
+        if (h.match === "knowledge_base") {
+          const k = h.knowledge;
+          return `<div class="reg" style="margin-bottom:6px;border-left-color:var(--general)">📄 <b>${k.source_file}</b> · ${k.section} <span class="tag mode">知识库 ${(h.score * 100).toFixed(0)}%</span><br>${k.text.replace(/\n+/g, " ").slice(0, 160)}…</div>`;
+        }
+        const g = h.regulation;
+        const badge = h.match === "exact" ? "" : h.match === "semantic"
+          ? ` <span class="tag mode">语义 ${(h.score * 100).toFixed(0)}%</span>` : "";
+        return `<div class="reg" style="margin-bottom:6px">📖 <b>${g.name_zh}</b> ${g.clause}${badge}<br>${g.requirement_zh}</div>`;
+      }).join("")
+    : `<div class="meta">无匹配条款</div>`;
+}
+async function renderProposals() {
+  const box = document.getElementById("proposal-list");
+  if (!box) return;
+  const [proposals, overrides] = await Promise.all([api("/api/proposals"), api("/api/overrides")]);
+  const active = Object.entries(overrides.risk_overrides || {}).map(([rid, o]) =>
+    `<div class="reg" style="border-left-color:var(--ok);margin-bottom:6px">✅ <b>${rid}</b> 自动确认下限=${o.min_verified_confidence}（${o.approved_by} 批准于 ${(o.approved_at || "").slice(0, 16).replace("T", " ")}）</div>`).join("");
+  const pending = proposals.filter((p) => p.status === "pending").map((p) =>
+    `<div class="reg" style="margin-bottom:6px">💡 <b>${p.risk_name_zh}</b>：${p.rationale}
+     <div class="btns" style="margin-top:6px">
+       <button class="act confirm" onclick="decideProposal('${p.proposal_id}','approve')">✔ 批准生效</button>
+       <button class="act reject" onclick="decideProposal('${p.proposal_id}','reject')">✘ 拒绝</button>
+     </div></div>`).join("");
+  const history = proposals.filter((p) => p.status !== "pending").map((p) =>
+    `<div class="meta">${p.status === "approved" ? "✅已批准" : "❌已拒绝"} ${p.risk_name_zh} → ${p.proposed_min_verified_confidence}（${p.decided_by || ""}）</div>`).join("");
+  box.innerHTML = (active ? `<div class="meta" style="margin-bottom:6px">当前生效覆盖：</div>${active}` : "") +
+    (pending || `<div class="meta">暂无待审批建议（案例库误报率未达触发条件）</div>`) + history;
+}
+async function decideProposal(id, decision) {
+  try {
+    const note = decision === "reject" ? (prompt("拒绝原因（可选）：", "") || "") : "";
+    await api(`/api/proposals/${id}/decide`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision, by: "safety_manager_demo", note }),
+    });
+    toast(decision === "approve" ? "已批准，阈值覆盖即刻生效（后续检测自动应用）" : "已拒绝该建议");
+    renderProposals();
+  } catch (err) { toast("操作失败：" + err.message); }
+}
+
+/* ---------- 页签 ---------- */
+$("#site-filter").addEventListener("change", () => {
+  SITE = $("#site-filter").value;
+  renderAlerts(); renderReview(); renderOrders();
+});
+document.querySelectorAll("nav button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    for (const sec of document.querySelectorAll("main > section")) sec.hidden = true;
+    $(`#tab-${btn.dataset.tab}`).hidden = false;
+  });
+});
+bootstrapAuth().then((ok) => {
+  if (ok) { connectWS(); loadAll().catch((err) => toast("加载失败：" + err.message)); }
+});
+setInterval(() => { renderAlerts(); }, 60000); // SLA倒计时刷新
+</script>
+</body>
+</html>

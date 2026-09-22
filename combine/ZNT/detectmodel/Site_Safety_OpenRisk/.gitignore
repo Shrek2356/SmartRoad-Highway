@@ -1,0 +1,10 @@
+# 本地密钥与大文件（勿提交）
+.env
+weights/sam3/sam3.pt
+weights/clip/*.pt
+weights/sam3/sam3-main/
+__pycache__/
+*.pyc
+outputs/
+app_data/
+.pytest_cache/

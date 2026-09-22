@@ -1,0 +1,15 @@
+# 完整检测依赖（Offline 本地 / Cloud 云端视觉 + 本地定位）
+# 注意：请先自行安装匹配 CUDA 的 PyTorch，再安装本文件
+-r detect-bridge.txt
+opencv-python>=4.8
+open_clip_torch>=2.24  # optional CLIP helper; disabled by default
+pytest>=8.0
+# SAM3（Windows 无 triton，项目内 edt.py 已提供 OpenCV 回退）
+iopath>=0.1.10
+huggingface_hub
+ftfy>=6.1
+regex
+tqdm
+# 新建官方 SAM3 环境使用 Python 3.12。取得代码后，用选中的检测 Python 执行：
+#   python -m pip install -e <应用目录>/third_party/sam3-main
+# torchvision必须与torch/CUDA成套安装，勿在此处单独指定版本。

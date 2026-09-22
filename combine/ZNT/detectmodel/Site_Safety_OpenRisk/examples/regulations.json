@@ -1,0 +1,193 @@
+{
+  "regulations": [
+    {
+      "regulation_id": "JGJ59-2011-HELMET",
+      "name_zh": "建筑施工安全检查标准 JGJ 59-2011",
+      "clause": "3.13.3",
+      "requirement_zh": "进入施工现场的人员必须正确佩戴安全帽。"
+    },
+    {
+      "regulation_id": "GB2811-HELMET-QUALITY",
+      "name_zh": "头部防护 安全帽 GB 2811",
+      "clause": "产品要求",
+      "requirement_zh": "安全帽应符合国家标准并在有效期内，佩戴时系紧下颏带。"
+    },
+    {
+      "regulation_id": "JGJ80-2016-EDGE",
+      "name_zh": "建筑施工高处作业安全技术规范 JGJ 80-2016",
+      "clause": "4.1 临边作业",
+      "requirement_zh": "临边作业必须设置防护栏杆、挡脚板，必要时挂设安全网。"
+    },
+    {
+      "regulation_id": "JGJ80-2016-OPENING",
+      "name_zh": "建筑施工高处作业安全技术规范 JGJ 80-2016",
+      "clause": "4.2 洞口作业",
+      "requirement_zh": "洞口作业必须设置防护设施，短边超过25cm的洞口应加盖板或防护栏杆。"
+    },
+    {
+      "regulation_id": "JGJ80-2016-HARNESS",
+      "name_zh": "建筑施工高处作业安全技术规范 JGJ 80-2016",
+      "clause": "3.0.2",
+      "requirement_zh": "高处作业人员应按规定系挂安全带，安全带应高挂低用。"
+    },
+    {
+      "regulation_id": "GB6095-HARNESS-QUALITY",
+      "name_zh": "坠落防护 安全带 GB 6095",
+      "clause": "产品要求",
+      "requirement_zh": "安全带应定期检验，部件不得擅自更换，破损立即报废。"
+    },
+    {
+      "regulation_id": "JGJ80-2016-CLIMB",
+      "name_zh": "建筑施工高处作业安全技术规范 JGJ 80-2016",
+      "clause": "攀登与悬空作业",
+      "requirement_zh": "攀登与悬空作业必须使用合格的登高设施并有可靠立足点。"
+    },
+    {
+      "regulation_id": "GB6067-LIFTING",
+      "name_zh": "起重机械安全规程 GB/T 6067.1",
+      "clause": "吊装作业",
+      "requirement_zh": "起重臂和吊物下方严禁站人、通行或作业。"
+    },
+    {
+      "regulation_id": "JGJ33-2012-LIFTING-CMD",
+      "name_zh": "建筑机械使用安全技术规程 JGJ 33-2012",
+      "clause": "起重吊装",
+      "requirement_zh": "吊装作业应设专职信号指挥，警戒区应设置围挡并有专人监护。"
+    },
+    {
+      "regulation_id": "JGJ46-2005-ELECTRIC",
+      "name_zh": "施工现场临时用电安全技术规范 JGJ 46-2005",
+      "clause": "临时用电",
+      "requirement_zh": "施工现场用电线路、设备的安装和防护必须符合规范，严禁线路裸露、私拉乱接。"
+    },
+    {
+      "regulation_id": "JGJ46-2005-TN-S",
+      "name_zh": "施工现场临时用电安全技术规范 JGJ 46-2005",
+      "clause": "配电系统",
+      "requirement_zh": "临时用电应采用TN-S系统与三级配电两级保护，电箱应上锁并有防雨措施。"
+    },
+    {
+      "regulation_id": "JGJ59-2011-PASSAGE",
+      "name_zh": "建筑施工安全检查标准 JGJ 59-2011",
+      "clause": "3.2 文明施工",
+      "requirement_zh": "材料应按平面布置图堆放整齐，不得侵占场内道路及安全通道。"
+    },
+    {
+      "regulation_id": "GB50720-EVACUATION",
+      "name_zh": "建设工程施工现场消防安全技术规范 GB 50720-2011",
+      "clause": "疏散通道",
+      "requirement_zh": "疏散通道、安全出口应保持畅通，不得堆放材料或设置障碍。"
+    },
+    {
+      "regulation_id": "JGJ130-2011-SCAFFOLD",
+      "name_zh": "建筑施工扣件式钢管脚手架安全技术规范 JGJ 130-2011",
+      "clause": "检查与验收",
+      "requirement_zh": "脚手架应结构完整、连接牢固，发现倾斜、变形、沉降应立即停用并整改。"
+    },
+    {
+      "regulation_id": "JGJ130-2011-SCAFFOLD-BOARD",
+      "name_zh": "建筑施工扣件式钢管脚手架安全技术规范 JGJ 130-2011",
+      "clause": "作业层",
+      "requirement_zh": "作业层脚手板应铺满、铺稳，外侧应设挡脚板和防护栏杆并挂密目安全网。"
+    },
+    {
+      "regulation_id": "GB50720-FIRE",
+      "name_zh": "建设工程施工现场消防安全技术规范 GB 50720-2011",
+      "clause": "动火与消防管理",
+      "requirement_zh": "现场出现烟雾、明火等异常时应立即处置并排查火源，动火作业须审批并配备消防器材。"
+    },
+    {
+      "regulation_id": "JGJ59-2011-MACHINERY",
+      "name_zh": "建筑施工安全检查标准 JGJ 59-2011",
+      "clause": "机械安全",
+      "requirement_zh": "施工机械作业半径内不得有无关人员停留，人机应保持安全距离。"
+    },
+    {
+      "regulation_id": "JGJ33-2012-EXCAVATOR",
+      "name_zh": "建筑机械使用安全技术规程 JGJ 33-2012",
+      "clause": "土方机械",
+      "requirement_zh": "挖掘机作业回转半径内严禁人员进入，配合作业人员应在驾驶员视线内。"
+    },
+    {
+      "regulation_id": "GB-T29639-EMERGENCY",
+      "name_zh": "生产经营单位生产安全事故应急预案编制导则 GB/T 29639",
+      "clause": "现场处置",
+      "requirement_zh": "发现人员伤害或失能应立即启动现场处置方案，先救人并保护现场。"
+    },
+    {
+      "regulation_id": "JGJ59-2011-PPE-VEST",
+      "name_zh": "建筑施工安全检查标准 JGJ 59-2011",
+      "clause": "个人防护",
+      "requirement_zh": "特殊作业环境人员应穿戴反光背心等相应个人防护用品。"
+    }
+  ],
+  "risk_regulation_map": {
+    "missing_helmet": ["JGJ59-2011-HELMET", "GB2811-HELMET-QUALITY"],
+    "missing_edge_protection": ["JGJ80-2016-EDGE", "JGJ80-2016-OPENING"],
+    "missing_fall_protection": ["JGJ80-2016-HARNESS", "GB6095-HARNESS-QUALITY", "JGJ80-2016-CLIMB"],
+    "worker_under_suspended_load": ["GB6067-LIFTING", "JGJ33-2012-LIFTING-CMD"],
+    "blocked_passage": ["JGJ59-2011-PASSAGE", "GB50720-EVACUATION"],
+    "collapsed_scaffold": ["JGJ130-2011-SCAFFOLD", "JGJ130-2011-SCAFFOLD-BOARD"],
+    "smoke_or_fire": ["GB50720-FIRE"],
+    "machinery_proximity": ["JGJ59-2011-MACHINERY", "JGJ33-2012-EXCAVATOR"],
+    "fallen_worker": ["GB-T29639-EMERGENCY"],
+    "exposed_wiring": ["JGJ46-2005-ELECTRIC", "JGJ46-2005-TN-S"]
+  },
+  "disposal_actions": {
+    "missing_helmet": [
+      "立即制止该人员作业，责令正确佩戴安全帽后方可返岗",
+      "核查其安全帽是否合格在有效期内，下颏带是否系紧",
+      "对班组进行安全帽佩戴专项教育并记录"
+    ],
+    "missing_edge_protection": [
+      "立即在临边/洞口设置警戒隔离，安排专人监护",
+      "当日内补装防护栏杆、挡脚板或洞口盖板并验收",
+      "排查同楼层同类临边洞口是否存在相同缺失"
+    ],
+    "missing_fall_protection": [
+      "立即暂停该高处作业，人员撤至安全区域",
+      "配发并检查安全带，确认可靠挂点后方可复工，安全带高挂低用",
+      "复核该区域生命线/挂点设置是否满足作业范围"
+    ],
+    "worker_under_suspended_load": [
+      "立即指挥吊物下方人员撤离，暂停起重作业",
+      "设置吊装警戒区围挡，安排信号指挥与专人监护",
+      "对司索工、信号工进行吊装安全交底后恢复作业"
+    ],
+    "blocked_passage": [
+      "组织当班人员立即清理占道材料，恢复通道畅通",
+      "按平面布置图规范材料堆放位置并设标识",
+      "检查消防疏散通道全线是否存在其他堵点"
+    ],
+    "collapsed_scaffold": [
+      "立即停用并隔离该脚手架区域，严禁人员靠近或上架",
+      "通知架子工班组与技术负责人现场核查，制定加固或拆除方案",
+      "加固整改后重新验收挂牌方可使用"
+    ],
+    "smoke_or_fire": [
+      "立即启动现场消防应急处置，组织初期扑救与人员疏散",
+      "切断相关区域电源与气源，排查火源与动火作业审批情况",
+      "留存现场影像，向项目安全负责人与消防管理部门报告"
+    ],
+    "machinery_proximity": [
+      "立即示意机械暂停回转/行走，指挥人员撤出作业半径",
+      "为该机械作业区设置警戒围挡与警示标志",
+      "落实机械作业专人指挥与人机隔离措施"
+    ],
+    "fallen_worker": [
+      "立即派人现场查看伤情，必要时拨打120并启动应急预案",
+      "保护现场，安排人员陪护，严禁随意移动重伤人员",
+      "查明倒地原因（中暑/触电/高坠/物体打击）并上报"
+    ],
+    "exposed_wiring": [
+      "立即断电隔离裸露线路区域，设置警示标志",
+      "由持证电工按规范重新敷设或绝缘处理后送电",
+      "排查现场私拉乱接情况，复核配电箱防护与接零保护"
+    ],
+    "_default": [
+      "安排安全员现场核实风险情况",
+      "根据现场核实结果采取隔离、整改或恢复措施",
+      "整改完成后拍照回传并闭环工单"
+    ]
+  }
+}

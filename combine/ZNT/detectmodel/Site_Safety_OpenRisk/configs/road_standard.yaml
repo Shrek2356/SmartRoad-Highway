@@ -1,0 +1,89 @@
+project_name: 路安智巡道路实验室原型
+random_seed: 42
+risk_operators:
+  path: configs/road_risk_operators.yaml
+screening:
+  enabled: false
+  gate_camera: false
+  models: []
+  calibration_version: road-pending-validation
+mllm:
+  backend: openai_compatible
+  api_key_env: MLLM_API_KEY
+  base_url_env: MLLM_BASE_URL
+  model_env: MLLM_MODEL
+  timeout_seconds: 600
+  temperature: 0.1
+  use_response_format: true
+  system_prompt: 你是道路风险视觉分析助手。只依据可见证据，严格输出JSON。
+  max_retries: 0
+  payload_extra:
+    max_tokens: 4096
+    seed: 42
+  trust_env: false
+report_llm:
+  enabled: false
+  backend: openai_compatible
+  api_key_env: GLM_API_KEY
+  base_url_env: GLM_BASE_URL
+  model_env: GLM_MODEL
+  timeout_seconds: 120
+  temperature: 0.1
+  use_response_format: true
+  memory_paths:
+  - examples/road_damage_catalog.json
+  system_prompt: 仅整理道路视觉核验事实，不改变风险判断，不编造位置、成因和检测成绩。
+sam3:
+  backend: bridge
+  bridge_module: integrations.sam3_bridge_user
+  bridge_class: SAM3Bridge
+  init_kwargs:
+    repo_path: ../../third_party/sam3-main
+    checkpoint: ../../models/sam3/sam3.pt
+    device: cuda
+    confidence_threshold: 0.2
+    amp_dtype: bfloat16
+clip:
+  enabled: false
+  backend: mock
+  bridge_module: integrations.clip_bridge_user
+  bridge_class: CLIPBridge
+  init_kwargs: {}
+  minimum_consistency_score: 0.2
+risk_catalog:
+  path: examples/road_damage_catalog.json
+  include_all_core: true
+  distractor_count: 0
+  allow_open_discovery: true
+pipeline:
+  screening_region_views:
+    max_crops: 3
+    crop_margin_ratio: 0.25
+  segment_statuses:
+  - present
+  - uncertain
+  min_mllm_candidate_confidence: 0.25
+  min_sam3_score: 0.2
+  max_sam3_tasks: 48
+  road_concept_segmentation: true
+  run_second_pass: true
+  save_entity_masks: true
+  save_risk_crops: true
+  second_pass_max_overlays: 6
+  relation_defaults:
+    horizontal_overlap_threshold: 0.25
+    near_distance_ratio: 0.3
+    overlap_threshold: 0.1
+    inside_threshold: 0.5
+    allow_missing_from_non_detection: false
+    allow_missing_from_visible_zone: true
+    confirmed_absence_confidence_cap: 0.9
+  mask_defaults:
+    projected_width_expand_ratio: 0.15
+    projected_max_object_height_ratio: 4.0
+    projected_max_image_height_ratio: 0.55
+  threshold_overrides_path: configs/road_threshold_overrides.json
+  second_pass_per_risk: true
+  road_observation_planning: true
+  road_max_planned_risks: 8
+domain: road
