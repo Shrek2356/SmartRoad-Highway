@@ -62,10 +62,12 @@ def test_environment_rejects_non_python_and_timeout():
 
 def test_incomplete_environment_cannot_replace_desktop_settings(tmp_path,monkeypatch):
     import desktop_app
-    target=tmp_path/'desktop-settings.json';target.write_text(json.dumps(desktop_app.DEFAULT_CONFIG))
+    # A source checkout need not bundle Python; use the current test interpreter.
+    config = {**desktop_app.DEFAULT_CONFIG, 'backend_python': sys.executable}
+    target=tmp_path/'desktop-settings.json';target.write_text(json.dumps(config), encoding='utf-8')
     monkeypatch.setattr(desktop_app,'CONFIG_PATH',target)
     def reject(*a,**k): raise ValueError('missing dependencies')
     monkeypatch.setattr(desktop_app,'check_python',reject)
-    runtime=desktop_app.DesktopRuntime(dict(desktop_app.DEFAULT_CONFIG))
+    runtime=desktop_app.DesktopRuntime(config)
     with pytest.raises(ValueError): runtime.save_desktop_settings({'frontend_port':55173})
-    assert json.loads(target.read_text())['frontend_port'] == 5173
+    assert json.loads(target.read_text(encoding='utf-8')) == config

@@ -80,7 +80,7 @@ class RoadMigrationTests(unittest.TestCase):
             self.assertTrue(all(r.risk_id == 'road_debris' for r in event.risks))
             self.assertTrue(all(r.manual_review_required for r in event.risks))
             # A context entity's large box must not enlarge the reported risk area.
-            evidence=json.loads((base/'run/evidence.json').read_text())
+            evidence=json.loads((base/'run/evidence.json').read_text(encoding='utf-8'))
             if evidence and evidence[0].get('risk_mask_path'):
                 from PIL import ImageDraw
                 mask=Image.new('L',(128,96),0)
