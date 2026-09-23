@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { routeNodes, landmarks, structures, devices, reports, normalSection } from '../../data/lexiDemo.js'
 
 /** All geometry is local and procedural; no external map / tile / model requests. */
-export function createHighwayScene(host, { onSelect, onLabels, onFailure, onReady }) {
+export function createHighwayScene(host, { onSelect, onLabels, onFailure, onReady, theme = 'dark' }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75))
   renderer.setClearColor('#0a2a65')
@@ -22,7 +22,8 @@ export function createHighwayScene(host, { onSelect, onLabels, onFailure, onRead
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
   const light = new THREE.DirectionalLight('#a3d6ff', 2.8)
   light.position.set(-70, 160, 90)
-  scene.add(light, new THREE.HemisphereLight('#8cd9f5', '#08152e', 2.5))
+  const hemisphere = new THREE.HemisphereLight('#8cd9f5', '#08152e', 2.5)
+  scene.add(light, hemisphere)
   const road = new THREE.CatmullRomCurve3(routeNodes.map(p => new THREE.Vector3(...p)))
   const sampled = road.getPoints(260)
   const vUp = new THREE.Vector3(0, 1, 0)
@@ -129,7 +130,7 @@ export function createHighwayScene(host, { onSelect, onLabels, onFailure, onRead
   sign.rotation.z = -0.2; scene.add(sign)
   mesh(new THREE.CylinderGeometry(.25,.25,7,8),material('#acc7d4'),new THREE.Vector3(0,3.5,0),sign)
   mesh(new THREE.BoxGeometry(6,3,.5),material('#168066'),new THREE.Vector3(0,7,0),sign)
-  // Normal wet road is green and is never a risk marker.
+  // Normal wet road is never a risk marker; its display follows the active theme.
   line(Array.from({ length: 32 }, (_,i) => pointAt(0.09+i/31*0.07,-4.8,.6)), '#52d7a2')
   function addMarker(item, kind) {
     const color = kind === 'risk' ? (item.severity === 'critical' ? '#ff6c75' : '#ffc66e') :
@@ -225,6 +226,47 @@ export function createHighwayScene(host, { onSelect, onLabels, onFailure, onRead
   }
   function motionChanged() { if (reduced.matches) controls.autoRotate=false }
   reduced.addEventListener('change',motionChanged)
+  // Recolor only procedural geometry. Retain risk colors and the current camera pose.
+  const originalColors = new Map(), originalVertices = new Map()
+  const inkColors = {
+    '344a60':'363636', '0a2b65':'d4d4d4', '26506b':'888888',
+    '4b99ba':'555555', '6fbbc8':'bdbdbd', 'b3d9df':'eeeeee', 'e3eff2':'fafafa',
+    '496b80':'737373', '5ccef0':'606060', '39768b':'888888', '74d3ed':'505050',
+    '20b7df':'888888', 'a5a8a0':'767676', 'c7ad80':'898989', 'acc7d4':'666666',
+    '168066':'3c3c3c', '52d7a2':'333333', '5bdbf2':'333333', 'a6b0c0':'888888',
+  }
+  const riskColors = new Set(['ff6c75', 'ffc66e'])
+  function recolor(color, ink) {
+    if (!originalColors.has(color)) originalColors.set(color, color.clone())
+    const original = originalColors.get(color), hex = original.getHexString()
+    color.copy(original)
+    if (!ink || riskColors.has(hex)) return
+    if (inkColors[hex]) color.set('#' + inkColors[hex])
+    else { const gray=original.r*.2126+original.g*.7152+original.b*.0722; color.setRGB(gray,gray,gray) }
+  }
+  function setTheme(mode) {
+    const ink=mode==='light'
+    renderer.setClearColor(ink ? '#f7f7f7' : '#0a2a65')
+    scene.fog.color.set(ink ? '#f7f7f7' : '#0a2a65')
+    light.color.set(ink ? '#ffffff' : '#a3d6ff');light.intensity=ink?1.8:2.8
+    hemisphere.color.set(ink ? '#ffffff' : '#8cd9f5')
+    hemisphere.groundColor.set(ink ? '#666666' : '#08152e');hemisphere.intensity=ink?1.8:2.5
+    scene.traverse(object=>{
+      const materials=object.material?(Array.isArray(object.material)?object.material:[object.material]):[]
+      for(const mat of materials){if(mat.color)recolor(mat.color,ink);if(mat.emissive)recolor(mat.emissive,ink)}
+      const attribute=object.geometry?.getAttribute('color')
+      if(!attribute)return
+      if(!originalVertices.has(attribute))originalVertices.set(attribute,attribute.array.slice())
+      const original=originalVertices.get(attribute)
+      for(let i=0;i<attribute.count;i++){
+        const r=original[i*3],g=original[i*3+1],b=original[i*3+2]
+        const gray=object.geometry===terrain ? .16+(r*.2126+g*.7152+b*.0722)*1.2 : .62
+        attribute.setXYZ(i,ink?gray:r,ink?gray:g,ink?gray:b)
+      }
+      attribute.needsUpdate=true
+    })
+    resume()
+  }
   function dispose() {
     if(dead)return
     dead=true;cancelAnimationFrame(raf);observer.disconnect();intersection.disconnect();controls.dispose()
@@ -235,6 +277,6 @@ export function createHighwayScene(host, { onSelect, onLabels, onFailure, onRead
     scene.traverse(object=>{if(object.geometry)geometries.add(object.geometry);if(object.material)(Array.isArray(object.material)?object.material:[object.material]).forEach(m=>materials.add(m))})
     geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove()
   }
-  setView();resize();onReady()
-  return { update,focus,setView,rotate,zoom,dispose }
+  setTheme(theme);setView();resize();onReady()
+  return { update,focus,setView,rotate,zoom,setTheme,dispose }
 }

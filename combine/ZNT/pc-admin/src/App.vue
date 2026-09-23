@@ -22,7 +22,7 @@ const activeTheme = computed(() => ({
   token: antTokens(colorTheme.value),
   components: {
     Slider: { colorPrimaryBorder: paletteFor(colorTheme.value).primary, colorPrimaryBorderHover: paletteFor(colorTheme.value)['primary-strong'] },
-    Tooltip: { colorBgDefault: '#122c3a', colorTextLightSolid: '#f1f8fb' },
+    Tooltip: { colorBgDefault: colorTheme.value === 'light' ? '#242424' : '#122c3a', colorTextLightSolid: colorTheme.value === 'light' ? '#fafafa' : '#f1f8fb' },
   },
 }))
 </script>

@@ -18,7 +18,7 @@
           <div class="animation-fallback">
             <div class="scan-ring scan-ring-one"></div>
             <div class="scan-ring scan-ring-two"></div>
-            <div style="font-size: 110px; color: #409eff; z-index: 2" aria-label="道路监测">路</div>
+            <div class="road-symbol" aria-label="道路监测">路</div>
             <span class="fallback-note">图像观察 · 风险复核 · 法规参考</span>
           </div>
           <div class="stage-grid"></div>
@@ -402,6 +402,7 @@ onBeforeUnmount(() => {
 .system-animation { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .stage-grid { position: absolute; inset: 0; opacity: 0.35; background: linear-gradient(rgba(92, 203, 237, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(92, 203, 237, 0.08) 1px, transparent 1px); background-size: 28px 28px; }
 .animation-fallback { position: absolute; z-index: 1; inset: 0; display: grid; place-items: center; }
+.road-symbol { font-size:110px; color:#409eff; z-index:2; }
 .fallback-mascot { position: relative; z-index: 2; width: min(42%, 210px); height: 78%; object-fit: contain; filter: drop-shadow(0 16px 25px rgba(0, 0, 0, 0.35)); animation: mascot-float 3.2s ease-in-out infinite; }
 .scan-ring { position: absolute; width: 230px; height: 230px; border-radius: 50%; border: 1px solid rgba(83, 210, 241, 0.36); animation: scan 3s linear infinite; }
 .scan-ring-two { width: 310px; height: 310px; animation-delay: -1.5s; }

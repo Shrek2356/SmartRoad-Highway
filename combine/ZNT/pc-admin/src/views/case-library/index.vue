@@ -102,7 +102,8 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { colorTheme } from '@/utils/theme'
 import { message } from 'ant-design-vue'
 import { fetchCases, fetchMaterials, generateMaterial } from '@/api/caseLibrary'
 import { saveFile } from '@/utils/saveFile'
@@ -175,10 +176,10 @@ function drawPoster(content) {
 
   // 背景
   const g = ctx.createLinearGradient(0, 0, 0, h)
-  // Printed artwork uses fixed, high-contrast colors independent of screen mode.
-  g.addColorStop(0, '#122c3a')
-  g.addColorStop(0.45, '#1e4d58')
-  g.addColorStop(1, '#087f78')
+  const ink = colorTheme.value === 'light'
+  g.addColorStop(0, ink ? '#222222' : '#122c3a')
+  g.addColorStop(0.45, ink ? '#444444' : '#1e4d58')
+  g.addColorStop(1, ink ? '#666666' : '#087f78')
   ctx.fillStyle = g
   ctx.fillRect(0, 0, w, h)
 
@@ -192,7 +193,7 @@ function drawPoster(content) {
   ctx.textAlign = 'center'
   ctx.fillText(content.headline || '道路风险提示', w / 2, 78)
 
-  ctx.fillStyle = '#203544'
+  ctx.fillStyle = ink ? '#202020' : '#203544'
   ctx.font = 'bold 32px Microsoft YaHei, sans-serif'
   ctx.textAlign = 'left'
   let y = wrapText(ctx, content.title, 80, 190, w - 160, 42)
@@ -202,7 +203,7 @@ function drawPoster(content) {
   y = wrapText(ctx, content.summary, 80, y + 36, w - 160, 34)
 
   y += 48
-  ctx.fillStyle = '#08766f'
+  ctx.fillStyle = ink ? '#333333' : '#08766f'
   ctx.font = 'bold 24px Microsoft YaHei, sans-serif'
   ctx.fillText('安全提示', 80, y)
   ctx.fillStyle = '#434343'
@@ -298,6 +299,8 @@ async function onGenerate() {
     genLoading.value = false
   }
 }
+
+watch(colorTheme, async () => { await nextTick(); if (lastResult.value?.content) drawPoster(lastResult.value.content) })
 
 onMounted(async () => {
   await loadCases()

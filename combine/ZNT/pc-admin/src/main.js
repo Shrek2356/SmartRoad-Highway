@@ -10,6 +10,7 @@ import App from './App.vue'
 import router from './router'
 import './styles/global.css'
 import './styles/product.css'
+import './styles/ink-light.css'
 
 const app = createApp(App)
 

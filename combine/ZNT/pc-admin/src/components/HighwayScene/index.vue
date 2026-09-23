@@ -8,11 +8,11 @@
       <div ref="host" class="webgl-host" :class="{ hidden: error }" />
       <div v-if="error" class="fallback-map">
         <svg viewBox="0 0 350 190" role="img" aria-label="三维不可用时的二维道路示意">
-          <defs><pattern id="road-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#214263" stroke-width=".3" /></pattern></defs>
+          <defs><pattern id="road-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" :stroke="colorTheme === 'light' ? '#cccccc' : '#214263'" stroke-width=".3" /></pattern></defs>
           <rect width="350" height="190" fill="url(#road-grid)" />
-          <polyline :points="fallbackRoad" fill="none" stroke="#243f5c" stroke-width="9" />
-          <polyline :points="fallbackRoad" fill="none" stroke="#6fd6ed" stroke-width=".8" stroke-dasharray="3 2" />
-          <g v-for="p in fallbackPoints" :key="p.id"><circle :cx="p.x" :cy="p.y" r="3" :fill="p.kind === 'risk' ? '#ff868c' : '#6fd6ed'"/><text :x="p.x" :y="p.y - 6" fill="#deefff" font-size="4" text-anchor="middle">{{ p.short }}</text></g>
+          <polyline :points="fallbackRoad" fill="none" :stroke="colorTheme === 'light' ? '#555555' : '#243f5c'" stroke-width="9" />
+          <polyline :points="fallbackRoad" fill="none" :stroke="colorTheme === 'light' ? '#eeeeee' : '#6fd6ed'" stroke-width=".8" stroke-dasharray="3 2" />
+          <g v-for="p in fallbackPoints" :key="p.id"><circle :cx="p.x" :cy="p.y" r="3" :fill="p.kind === 'risk' ? '#ff868c' : colorTheme === 'light' ? '#333333' : '#6fd6ed'"/><text :x="p.x" :y="p.y - 6" :fill="colorTheme === 'light' ? '#202020' : '#deefff'" font-size="4" text-anchor="middle">{{ p.short }}</text></g>
         </svg>
         <div class="fallback-notice"><p>{{ error }}</p><button class="tool-button" @click="initialize">重试三维</button></div>
       </div>
@@ -47,6 +47,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { devices, reports, routeNodes } from '../../data/lexiDemo.js'
+import { colorTheme } from '../../utils/theme'
 const props = defineProps({ selectedId: String, layers: Object, severity: String })
 const emit = defineEmits(['select'])
 const host=ref(null),shell=ref(null),labels=ref([]),ready=ref(false),error=ref(''),expanded=ref(false),autoRotate=ref(false),reducedMotion=ref(false)
@@ -70,13 +71,14 @@ async function initialize(){
   try{
     const {createHighwayScene}=await import('./scene.js')
     if(disposed||current!==generation)return
-    engine=createHighwayScene(host.value,{onSelect:id=>emitSelection(id),onLabels:value=>{labels.value=value},onReady:()=>{ready.value=true},onFailure:fail})
+    engine=createHighwayScene(host.value,{theme:colorTheme.value,onSelect:id=>emitSelection(id),onLabels:value=>{labels.value=value},onReady:()=>{ready.value=true},onFailure:fail})
     update()
   }catch{if(!disposed&&current===generation)fail('当前环境无法启用三维，已显示二维示意。设备和报告仍可通过下方列表查看。')}
 }
 // Keep selection in the parent so canvas, accessible lists and report details stay consistent.
 function emitSelection(id){ emit('select', id) }
 watch(()=>[props.selectedId,props.layers.devices,props.layers.risks,props.severity,autoRotate.value],update)
+watch(colorTheme,mode=>engine?.setTheme(mode))
 watch(expanded,async()=>{await nextTick();shell.value?.querySelector('.scene-header button')?.focus()})
 function keydown(event){
   if(event.key==='Escape')expanded.value=false
