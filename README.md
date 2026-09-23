@@ -2,9 +2,9 @@
 
 面向高速公路建设与管理的道路风险检测实验室原型，集道路概况、摄像头查看、图像风险分析、带图报告和历史档案于一体。系统通过 Qwen 观察与复核、SAM3 多概念定位及道路法规检索，把图像中的风险线索转为可追溯、可人工复核的管理记录。当前重点验证服务器端分析，端侧实时模型暂缓训练。
 
-[项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html) · [已发布安装包](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.5)
+[下载 Windows 安装包 v1.4.6](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.6/SmartRoad-Inspection_Setup_v1.4.6_x64.exe) · [安装与验证](docs/validation/v1.4.6/README.md) · [项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html)
 
-> **版本说明：** 已发布安装包为 **v1.4.5**。下方最新界面已同步至 `main` 源码并更新到开发本机；深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大等后续前端更新，尚未重新打入该 Release 安装包。使用最新源码的部署方法见文末。
+> **版本说明：** 最新安装包 **v1.4.6** 已包含下方展示的深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大功能，可直接下载安装。基础包自带界面与服务运行时；真实检测所需模型权重及 GPU 环境另行配置。项目仍处于实验室小试阶段。
 
 ## 应用能做什么
 
@@ -64,7 +64,7 @@
 4. 查看已有带图报告与历史档案；运行新的真实检测前，按部署说明配置模型及服务。
 
 - [完整带图报告 HTML](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html) · [报告与原始附件 ZIP](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-bundle-20260922.zip)
-- [v1.4.5 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.5) · [安装与档案保留验证](docs/validation/v1.4.5/README.md)
+- [v1.4.6 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.6) · [安装与档案保留验证](docs/validation/v1.4.6/README.md)
 - [检测历史与原图归档](docs/DETECTION_HISTORY.md)：历史原图、标注、掩码及报告导入与长期留存。
 - [环境部署说明](combine/ZNT/requirements/README.md) · [v1.4.4 模型测试与验证摘要](docs/validation/v1.4.4/README.md)
 - [道路领域迁移检查](combine/ZNT/docs/道路领域全面迁移检查_20260921.md)
@@ -121,7 +121,7 @@ flowchart LR
 |---|---|
 | **SmartRoad-Highway** | 当前道路项目主仓库，2026-09-22 建立；后续开发和同步使用本仓库。 |
 | [SmartRoad-Inspection](https://github.com/Shrek2356/SmartRoad-Inspection) | 2026-09-13 建立的旧迁移仓库；核对时远端仍是早期基线 `4740ff3`，保留作历史追溯。 |
-| `SmartRoad-Inspection.exe`、同名安装目录 | 当前 1.4.5 软件沿用的程序与安装名称，承载的已是新版道路流程；不是另一套模型。 |
+| `SmartRoad-Inspection.exe`、同名安装目录 | 当前 1.4.6 软件沿用的程序与安装名称，承载的已是新版道路流程；不是另一套模型。 |
 
 `SmartRoad-Highway` 已按项目所有者要求公开，便于分享给老师。`Inspection` 是“巡检、检测”的意思；仓库名称和软件安装名称属于不同层次。
 

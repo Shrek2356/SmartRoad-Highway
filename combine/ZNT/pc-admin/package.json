@@ -1,7 +1,7 @@
 {
   "name": "znt-pc-admin",
   "private": true,
-  "version": "1.4.5",
+  "version": "1.4.6",
   "type": "module",
   "description": "路安智巡道路监测实验室原型 - PC管理后台",
   "scripts": {

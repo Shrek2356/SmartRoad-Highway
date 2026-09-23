@@ -1,6 +1,6 @@
 param(
     [string]$Destination = 'E:\work\智慧交通\软件包',
-    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.4.5_road'
+    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.4.6_road'
 )
 $ErrorActionPreference = 'Stop'
 $appSource = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -41,15 +41,29 @@ function Copy-Tree([string]$relative) {
 Copy-Tree 'python-runtime'
 Copy-Tree 'pc-admin\dist'
 Copy-Tree 'pc-admin\public'
+# Only the road-monitor examples are released; legacy media stays excluded.
+Copy-Tree 'pc-admin\dist\media\road-monitor'
+Copy-Tree 'pc-admin\public\media\road-monitor'
 Copy-Tree 'pc-admin\src'
 Copy-Tree 'pc-admin\tests'
+Copy-Tree 'pc-admin\scripts'
 Copy-Tree 'detectmodel\Site_Safety_OpenRisk'
 Copy-Tree 'desktop'
 Copy-Tree 'requirements'
 Copy-Tree 'docs'
-$historyGuide = Join-Path $appSource '..\..\docs\DETECTION_HISTORY.md'
-if (Test-Path -LiteralPath $historyGuide) {
-    Copy-Item -LiteralPath $historyGuide -Destination (Join-Path $releaseRoot 'docs\DETECTION_HISTORY.md')
+foreach ($guide in @('DETECTION_HISTORY.md','HIGHWAY_OVERVIEW.md','INK_LIGHT_THEME.md','READING_AND_ZOOM.md')) {
+    Copy-Item -LiteralPath (Join-Path $appSource "..\..\docs\$guide") -Destination (Join-Path $releaseRoot "docs\$guide")
+}
+Copy-Item -LiteralPath (Join-Path $appSource '..\..\docs\images') -Destination (Join-Path $releaseRoot 'docs\images') -Recurse
+# Fail before sealing if a camera image was omitted or changed during copying.
+$roadMedia = Get-Content -LiteralPath (Join-Path $appSource 'pc-admin\public\media\road-monitor\provenance.json') -Raw -Encoding utf8 | ConvertFrom-Json
+foreach ($base in @('pc-admin\public','pc-admin\dist')) {
+    foreach ($entry in $roadMedia) {
+        $image = Join-Path $releaseRoot "$base\media\road-monitor\$($entry.file)"
+        if (-not (Test-Path -LiteralPath $image) -or (Get-FileHash -LiteralPath $image -Algorithm SHA256).Hash -ne $entry.sha256) {
+            throw "监控示例图片未完整打包：$image"
+        }
+    }
 }
 foreach ($file in @('requirements.txt','LICENSE','THIRD_PARTY_NOTICE.md','COMPETITION_SUBMISSION_NOTICE.md','部署助手.bat','start-local-qwen.bat','stop-platform.bat')) {
     $path = Join-Path $appSource $file
