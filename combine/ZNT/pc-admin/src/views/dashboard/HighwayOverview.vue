@@ -32,7 +32,8 @@
             <dl class="detail-facts"><div><dt>设备编号</dt><dd>{{ selectedDevice.id }}</dd></div><div><dt>示例规格</dt><dd>{{ selectedDevice.spec }}</dd></div><div><dt>模拟状态</dt><dd>{{ selectedDevice.metric }}</dd></div></dl>
             <section class="report-excerpt"><h3>监测用途</h3><p>{{ selectedDevice.detail }}</p></section>
             <section class="report-excerpt"><h3>关联演示报告</h3><button v-for="r in relatedReports" :key="r.id" class="related-report" @click="selectPoint(r.id)">{{ r.title }} ↗</button><p v-if="!relatedReports.length">该演示点位暂无关联报告。</p></section>
-            <a-button size="small" block @click="locateSelected"><AimOutlined /> 在模型中定位</a-button><p class="evidence-note">设备、状态与参数均为虚构，未连接摄像头或雷达。</p>
+            <a-button v-if="cameraMonitorLocation(selectedDevice.id)" size="small" type="primary" block @click="openCamera(selectedDevice.id)"><VideoCameraOutlined /> 查看监控示例</a-button>
+            <a-button size="small" block style="margin-top:8px" @click="locateSelected"><AimOutlined /> 在模型中定位</a-button><p class="evidence-note">设备、状态与参数均为虚构，未连接摄像头或雷达。</p>
           </template>
           <div v-else class="detail-empty"><AimOutlined /><p>选择模型上的点位，或从下方列表查看详情。</p></div>
         </div>
@@ -44,7 +45,8 @@
         <div class="normal-note"><CheckCircleOutlined /><div><strong>{{ normalSection.name }}</strong><span>{{ normalSection.description }}</span></div></div>
       </section>
       <section class="record-panel"><header class="panel-heading"><span class="section-index">04 /</span><strong>沿线设备台账</strong><span class="panel-count">{{ devices.length }} 台演示</span></header>
-        <div class="device-table-wrap"><table class="device-table"><thead><tr><th>设备 / 点位</th><th>示意桩号</th><th>模拟状态</th><th><span class="sr-only">操作</span></th></tr></thead><tbody><tr v-for="d in devices" :key="d.id" :class="{ selected:selectedId===d.id }"><td><button @click="selectPoint(d.id)"><span class="device-code">{{ d.short }}</span>{{ d.name }}</button></td><td>{{ d.chainage }}</td><td><span class="device-status" :class="d.state">{{ deviceStateLabels[d.state] }}</span></td><td><button :aria-label="`定位${d.name}`" @click="selectPoint(d.id); locateSelected()">⌖</button></td></tr></tbody></table></div>
+        <p class="device-list-hint">摄像头名称：单击看详情，双击打开监控示例；键盘按 Enter 打开。</p>
+        <div class="device-table-wrap"><table class="device-table"><thead><tr><th>设备 / 点位</th><th>示意桩号</th><th>模拟状态</th><th><span class="sr-only">操作</span></th></tr></thead><tbody><tr v-for="d in devices" :key="d.id" :class="{ selected:selectedId===d.id }"><td><button :title="cameraMonitorLocation(d.id) ? '双击打开此摄像头的监控示例' : '查看设备详情'" @click="selectPoint(d.id)" @dblclick="openCamera(d.id)" @keydown.enter.prevent="cameraMonitorLocation(d.id) ? openCamera(d.id) : selectPoint(d.id)"><span class="device-code">{{ d.short }}</span>{{ d.name }}</button></td><td>{{ d.chainage }}</td><td><span class="device-status" :class="d.state">{{ deviceStateLabels[d.state] }}</span></td><td><button :aria-label="`定位${d.name}`" @click="selectPoint(d.id); locateSelected()">⌖</button></td></tr></tbody></table></div>
       </section>
     </section>
     <footer class="overview-footer"><span>LABORATORY PROTOTYPE <i>/</i> 演示与真实检测分开记录</span><router-link to="/help-center">使用与支持 →</router-link></footer>
@@ -54,12 +56,16 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
+import { cameraMonitorLocation } from '@/data/lexiCameras.js'
 import { AimOutlined, CheckCircleOutlined, DeploymentUnitOutlined, DownloadOutlined, EnvironmentOutlined, FileTextOutlined, InfoCircleOutlined, RadarChartOutlined, VideoCameraOutlined, WarningOutlined } from '@ant-design/icons-vue'
 import HighwayScene from '@/components/HighwayScene/index.vue'
 import { corridor, devices, reports, normalSection, severityLabels, deviceStateLabels, demoSummary, selectReports, demoReportMarkdown } from '@/data/lexiDemo.js'
 import { saveFile } from '@/utils/saveFile'
 const summary=demoSummary(),layers=reactive({devices:true,risks:true}),severity=ref('all'),scene=ref(null)
 const selectedId=ref(reports[0].id)
+const router=useRouter()
+function openCamera(id){const target=cameraMonitorLocation(id);if(target)router.push(target)}
 const metrics=[
   {label:'演示设备总数',value:summary.devices,unit:'台',icon:DeploymentUnitOutlined,note:'沿线感知点位',color:'cyan'},
   {label:'模拟在线设备',value:summary.online,unit:`/ ${summary.devices}`,icon:CheckCircleOutlined,note:'1 离线 · 1 检修',color:'green'},

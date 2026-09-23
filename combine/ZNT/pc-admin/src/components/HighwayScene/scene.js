@@ -6,11 +6,11 @@ import { routeNodes, landmarks, structures, devices, reports, normalSection } fr
 export function createHighwayScene(host, { onSelect, onLabels, onFailure, onReady }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75))
-  renderer.setClearColor('#07182f')
+  renderer.setClearColor('#0a2a65')
   host.appendChild(renderer.domElement)
   renderer.domElement.setAttribute('aria-label', '可旋转的乐西高速三维示意模型，左键拖动旋转，滚轮缩放，右键平移；点位也可由下方列表选择')
   const scene = new THREE.Scene()
-  scene.fog = new THREE.FogExp2('#07182f', 0.0016)
+  scene.fog = new THREE.FogExp2('#0a2a65', 0.0016)
   const camera = new THREE.PerspectiveCamera(42, 1, 0.2, 1600)
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
@@ -62,17 +62,17 @@ export function createHighwayScene(host, { onSelect, onLabels, onFailure, onRead
   for (let i = 0; i < positions.count; i++) {
     const h = terrainHeight(positions.getX(i), positions.getZ(i))
     positions.setY(i, h)
-    const c = new THREE.Color('#0c2b42').lerp(new THREE.Color('#23516a'), THREE.MathUtils.clamp(h / 54, 0, 1))
+    const c = new THREE.Color('#123c77').lerp(new THREE.Color('#286398'), THREE.MathUtils.clamp(h / 54, 0, 1))
     colors.push(c.r, c.g, c.b)
   }
   terrain.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
   terrain.computeVertexNormals()
   mesh(terrain, material('#ffffff', { vertexColors: true, flatShading: true }))
   mesh(terrain, new THREE.MeshBasicMaterial({ color: '#4b99ba', wireframe: true, transparent: true, opacity: 0.075 }))
-  const grid = new THREE.GridHelper(460, 46, '#214968', '#123452')
+  const grid = new THREE.GridHelper(460, 46, '#346ca9', '#1c4886')
   grid.position.y = -8
   scene.add(grid)
-  const base = mesh(new THREE.BoxGeometry(350, 3, 190), material('#09213a'), new THREE.Vector3(0, -9, 0))
+  const base = mesh(new THREE.BoxGeometry(350, 3, 190), material('#0a2b65'), new THREE.Vector3(0, -9, 0))
   scene.add(new THREE.BoxHelper(base, '#26506b'))
   // Road ribbon follows the same curve used for every device and report anchor.
   const vertices = [], indices = []

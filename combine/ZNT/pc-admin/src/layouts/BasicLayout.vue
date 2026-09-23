@@ -70,7 +70,7 @@
  * 主布局：侧栏菜单 + 顶栏项目切换 + 内容区
  * 【后续修改入口】菜单来自路由 meta，新增页面只需加路由
  */
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   DashboardOutlined,
@@ -139,8 +139,10 @@ const menuGroups = computed(() => [
 
 watch(
   () => route.path,
-  (p) => {
+  async (p) => {
     selectedKeys.value = [p.replace(/^\//, '')]
+    await nextTick()
+    document.getElementById('main-content')?.scrollTo({top:0,left:0,behavior:'instant'})
   }
 )
 

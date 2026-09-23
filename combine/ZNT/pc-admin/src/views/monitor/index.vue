@@ -8,7 +8,9 @@
     <div class="toolbar">
       <a-space>
         <span class="page-title" style="margin: 0">实时视频监控</span>
+        <a-radio-group :value="isDemo ? 'demo' : 'live'" size="small" @change="changeSourceMode"><a-radio-button value="live">真实设备</a-radio-button><a-radio-button value="demo">乐西演示设备</a-radio-button></a-radio-group>
         <a-radio-group v-model:value="grid" button-style="solid" size="small">
+          <a-radio-button :value="1">单画面</a-radio-button>
           <a-radio-button :value="4">4 分栏</a-radio-button>
           <a-radio-button :value="9">9 分栏</a-radio-button>
           <a-radio-button :value="16">16 分栏</a-radio-button>
@@ -17,20 +19,25 @@
         <a-button v-if="isAdmin" size="small" @click="openSources">视频源接入与任务控制</a-button>
       </a-space>
     </div>
+    <a-alert v-if="isDemo" type="info" show-icon message="正常道路静态示例 · 非实时视频"
+      description="摄像头名称与示例图按设备 ID 固定匹配。图片来自既有道路测试样例，不是乐西高速实景；不代表首页演示事件的当前状态，不产生告警或检测记录。" />
+    <a-alert v-if="loadError" type="warning" show-icon :message="loadError" />
+    <div v-if="selectedCamera" class="selected-camera-title">当前画面：<strong>{{ selectedCamera.name }}</strong><span>{{ selectedCamera.id }}</span><span v-if="isDemo">示例 {{ selectedCamera.sample }}</span></div>
 
     <div class="body">
       <!-- 左侧设备树 -->
       <div class="left-tree">
-        <div class="panel-title">设备树</div>
+        <div class="panel-title">{{ isDemo ? '演示摄像头' : '设备树' }}</div>
         <a-tree
           v-if="treeData.length"
           :tree-data="treeData"
           default-expand-all
+          :selected-keys="selectedCamId ? [selectedCamId] : []"
           @select="onSelect"
         >
-          <template #title="{ title, online, isLeaf }">
+          <template #title="{ title, online, isLeaf, presentationAsset }">
             <span>
-              <a-badge v-if="isLeaf" :status="online === false ? 'default' : 'success'" />
+              <a-badge v-if="isLeaf" :status="presentationAsset || online === false ? 'default' : 'success'" />
               {{ title }}
             </span>
           </template>
@@ -52,6 +59,8 @@
             :stream-url="cam.streamUrl"
             :online="cam.online"
             :masks="cam.masks"
+            :example-image="isDemo && cam.source === 'demo' ? cam.exampleImage : ''"
+            :example-source="isDemo && cam.source === 'demo' ? cam.exampleSource : ''"
           />
           <div v-else class="empty-cell">空闲窗口</div>
         </div>
@@ -59,8 +68,9 @@
 
       <!-- 右侧告警侧边栏 -->
       <div class="right-alarm">
-        <div class="panel-title">实时告警</div>
-        <div v-if="!alarms.length" class="alarm-empty">暂无告警</div>
+        <div class="panel-title">{{ isDemo ? '示例说明' : '实时告警' }}</div>
+        <div v-if="isDemo" class="alarm-empty">当前展示正常道路参考图片，不进行实时检测。<p>湿润和反光本身不作为路面积水异常。</p><p>可从左侧切换摄像头，或使用分栏同时查看。</p></div>
+        <div v-else-if="!alarms.length" class="alarm-empty">{{ loadError ? '告警未加载' : '暂无告警' }}</div>
         <div
           v-for="a in alarms"
           :key="a.id"
@@ -105,14 +115,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import VideoPlayer from '@/components/VideoPlayer/index.vue'
 import { deleteStreamSource, fetchCameras, fetchDeviceTree, fetchRealtimeAlarms, fetchStreamSourceLog, fetchStreamSources, saveStreamSource, startStreamSource, stopStreamSource } from '@/api/monitor'
 import { message } from 'ant-design-vue'
+import { demoCameras, demoDeviceTree } from '@/data/lexiCameras.js'
+import { visibleCameras } from '@/utils/monitorSelection.js'
 
 const route = useRoute()
+const router = useRouter()
+const isDemo=computed(()=>route.query.source==='demo')
 const store = useUserStore()
 const isAdmin = computed(() => store.role === 'admin')
 const grid = ref(4)
@@ -121,6 +135,10 @@ const cameras = ref([])
 const alarms = ref([])
 const selectedCamId = ref('')
 const selectedIds = ref([])
+const loadError=ref('')
+const selectedCamera=computed(()=>cameras.value.find(c=>c.id===selectedCamId.value))
+let loadGeneration=0,disposed=false
+function changeSourceMode(event){router.push({path:'/monitor',query:event.target.value==='demo'?{source:'demo'}:{}})}
 const sourceOpen = ref(false)
 const sources = ref([])
 const sourceForm = ref({ id: 'CAM-RTSP-01', name: '现场摄像头', stream_url: '', preview_url: '', site_id: 'SITE-DEFAULT', profile: 'offline', interval_seconds: 2, audit_minutes: 30 })
@@ -152,14 +170,7 @@ const gridStyle = computed(() => {
   }
 })
 
-const displayCams = computed(() => {
-  const ids = selectedIds.value.length
-    ? selectedIds.value
-    : cameras.value.slice(0, grid.value).map((c) => c.id)
-  const list = ids.slice(0, grid.value).map((id) => cameras.value.find((c) => c.id === id))
-  while (list.length < grid.value) list.push(null)
-  return list
-})
+const displayCams = computed(() => visibleCameras(cameras.value,selectedCamId.value,selectedIds.value,grid.value))
 
 function levelText(l) {
   return { red: '高危', orange: '中危', yellow: '低危' }[l]
@@ -170,11 +181,13 @@ function statusText(s) {
 
 function onSelect(keys, { node }) {
   if (!node.isLeaf) return
-  const id = keys[0]
+  const id = keys[0] || node.key
+  if(!cameras.value.some(c=>c.id===id))return
   selectedCamId.value = id
   if (!selectedIds.value.includes(id)) {
     selectedIds.value = [id, ...selectedIds.value].slice(0, grid.value)
   }
+  router.replace({path:'/monitor',query:{...route.query,cameraId:id,layout:String(grid.value)}})
 }
 
 function focusCamera(camLabel) {
@@ -188,27 +201,34 @@ function focusCamera(camLabel) {
 }
 
 async function loadData() {
-  const [t, c, a] = await Promise.all([
-    fetchDeviceTree(),
-    fetchCameras(),
-    fetchRealtimeAlarms(),
-  ])
-  treeData.value = t.data
-  cameras.value = c.data
-  alarms.value = a.data
-
-  // 支持从驾驶舱点位跳转
-  if (route.query.cameraId) {
-    selectedIds.value = [route.query.cameraId]
-    selectedCamId.value = route.query.cameraId
+  const generation=++loadGeneration
+  const mode=isDemo.value,requested=typeof route.query.cameraId==='string'?route.query.cameraId:''
+  loadError.value='';treeData.value=[];cameras.value=[];alarms.value=[];selectedIds.value=[];selectedCamId.value=''
+  const requestedGrid=Number(route.query.layout)
+  if([1,4,9,16].includes(requestedGrid))grid.value=requestedGrid
+  try{
+    if(mode){treeData.value=demoDeviceTree;cameras.value=demoCameras}
+    else{
+      const [t,c,a]=await Promise.all([fetchDeviceTree(),fetchCameras(),fetchRealtimeAlarms()])
+      if(disposed||generation!==loadGeneration)return
+      treeData.value=t.data;cameras.value=c.data;alarms.value=a.data
+    }
+    const found=cameras.value.find(c=>c.id===requested)
+    if(requested&&!found){loadError.value='未找到指定摄像头，请从左侧设备树选择。';return}
+    selectedCamId.value=found?.id||cameras.value[0]?.id||''
+    selectedIds.value=selectedCamId.value?[selectedCamId.value]:[]
+  }catch{
+    if(!disposed&&generation===loadGeneration)loadError.value='真实监控数据加载失败，请检查业务服务；未切换为演示画面。'
   }
 }
 
-onMounted(loadData)
+watch(()=>[route.query.source,route.query.cameraId,route.query.layout],loadData,{immediate:true})
+onBeforeUnmount(()=>{disposed=true;loadGeneration++})
 </script>
 
 <style scoped>
-.monitor-page { display: flex; flex-direction: column; gap: 12px; height: calc(100vh - 120px); }
+.monitor-page { display:flex;flex-direction:column;gap:12px;min-height:650px;height:calc(100vh - 200px); }
+.toolbar :deep(.ant-space){flex-wrap:wrap}.selected-camera-title{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-secondary)}.selected-camera-title strong{color:var(--text-primary)}.selected-camera-title>span{font-size:10px;color:var(--text-muted)}
 .toolbar {
   background: var(--surface);
   border-radius: 8px;
@@ -217,7 +237,7 @@ onMounted(loadData)
 }
 .body { flex: 1; display: flex; gap: 12px; min-height: 0; }
 .left-tree, .right-alarm {
-  width: 240px;
+  width: 205px;flex-shrink:0;
   background: var(--surface);
   border-radius: 8px;
   padding: 12px;
@@ -225,14 +245,15 @@ onMounted(loadData)
   border: 1px solid var(--border-color);
 }
 .panel-title { font-weight: 600; margin-bottom: 10px; color: var(--text-primary); }
+.left-tree :deep(.ant-tree){font-size:12px}.left-tree :deep(.ant-tree-indent-unit){width:12px}.left-tree :deep(.ant-tree-switcher){width:16px;flex-basis:16px}
 .center-grid {
   flex: 1;
   display: grid;
   gap: 6px;
-  background: #141414;
+  background: var(--media-bg);
   border-radius: 8px;
   padding: 6px;
-  min-height: 0;
+  min-height: 0;min-width:0;
 }
 .grid-cell {
   min-height: 0;
@@ -246,8 +267,8 @@ onMounted(loadData)
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8c8c8c;
-  background: #1f1f1f;
+  color: var(--text-muted);
+  background: var(--surface-2);
 }
 .alarm-item {
   padding: 8px 0;
@@ -259,7 +280,7 @@ onMounted(loadData)
 .alarm-empty {
   padding: 16px 0;
   font-size: 12px;
-  color: #bfbfbf;
+  color: var(--text-secondary);
 }
 .alarm-title {
   font-size: 13px;
@@ -277,4 +298,7 @@ onMounted(loadData)
 .lv-orange { color: var(--warning); }
 .lv-yellow { color: var(--caution); }
 .source-log { max-height: 560px; overflow: auto; white-space: pre-wrap; background: #101820; color: #dbe6ec; padding: 14px; border-radius: 6px; }
+@media(max-width:1400px){.right-alarm{width:170px}.left-tree{width:190px}}
+@media(max-width:1100px){.body{flex-wrap:wrap}.right-alarm{width:100%;max-height:130px}.center-grid{min-height:340px}.monitor-page{height:auto;min-height:0}.selected-camera-title{flex-wrap:wrap}}
+@media(max-width:650px){.left-tree{width:100%;max-height:180px}.center-grid{flex-basis:100%}.toolbar{padding:10px}}
 </style>

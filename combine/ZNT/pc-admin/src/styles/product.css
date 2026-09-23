@@ -21,7 +21,8 @@
 .basic-layout .mode-state.wait { color:var(--warning); }
 .industrial-label { font:10px Consolas,'Microsoft YaHei',monospace;letter-spacing:1px;color:var(--text-muted);white-space:nowrap; }
 .industrial-label i { font-style:normal;color:var(--primary);margin:0 7px; }
-:root[data-theme=dark] .basic-layout .header { background:linear-gradient(100deg,#0d2441,#0a1a30);border-bottom-color:#335c77; }
+:root[data-theme=dark] .basic-layout .header { background:linear-gradient(100deg,#164387,#0c2a66);border-bottom-color:#3867a6; }
+:root[data-theme=dark] .basic-layout .ant-alert-info { background:#123c7b;border-color:#3867a6; }
 :root[data-theme=dark] .basic-layout .content { background-image:linear-gradient(#4baace04 1px,transparent 1px),linear-gradient(90deg,#4baace04 1px,transparent 1px);background-size:36px 36px; }
 .basic-layout .ant-menu-item { border-radius:4px; }
 .basic-layout .brand-symbol { border-radius:5px; }

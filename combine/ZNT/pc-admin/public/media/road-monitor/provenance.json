@@ -1,0 +1,37 @@
+[
+  {
+    "file": "normal-day.jpg",
+    "sample": "N02",
+    "source": "UA-DETRAC public dataset sample",
+    "sha256": "34f79ea649ce1cd692e5efa59e31dd0f80acc95f98f565ac91cdee9e57d52599",
+    "use": "static normal-road presentation; not Lexi camera capture; not new model evaluation"
+  },
+  {
+    "file": "normal-corridor.jpg",
+    "sample": "N04",
+    "source": "UA-DETRAC public dataset sample",
+    "sha256": "b6d955ee69af6ef08e80565e5a219a9925a08ff0dac4adbbbce0a4ca08a176a2",
+    "use": "static normal-road presentation; not Lexi camera capture; not new model evaluation"
+  },
+  {
+    "file": "normal-wet-highway.png",
+    "sample": "S10",
+    "source": "synthetic highway sample",
+    "sha256": "aae8f871491a58dd22c9b6ebcb184fa779b1dc0d3d1f6ba1d5e3a2ea402c2905",
+    "use": "static normal-road presentation; not Lexi camera capture; not new model evaluation"
+  },
+  {
+    "file": "normal-wet.jpg",
+    "sample": "N03",
+    "source": "UA-DETRAC public dataset sample",
+    "sha256": "f64aa0289025f25e7e920eda85959933f21222ad6ef968cd450c3cfe15861f87",
+    "use": "static normal-road presentation; not Lexi camera capture; not new model evaluation"
+  },
+  {
+    "file": "normal-night.jpg",
+    "sample": "N01",
+    "source": "UA-DETRAC public dataset sample",
+    "sha256": "d7c01ea3b84316a3e2bd2d4c49c790c0b3dde5a7c482b9db3612eadb4b1c7229",
+    "use": "static normal-road presentation; not Lexi camera capture; not new model evaluation"
+  }
+]

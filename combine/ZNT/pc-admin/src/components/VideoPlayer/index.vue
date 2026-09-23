@@ -1,12 +1,15 @@
 <template>
   <div class="video-player" ref="wrapRef">
+    <img v-if="showExample && !imageError" class="example-image" :src="exampleImage" :alt="`${name} · 正常道路静态示例，非该点位实景`" @error="imageError=true" />
+    <div v-if="showExample" class="example-caption"><strong>{{ name }}</strong><span>正常路况示例 · 非实时</span></div>
+    <div v-if="showExample && !imageError" class="example-source">{{ exampleSource }}<br />静态参考图，不对应此摄像头实景或当前路况</div>
     <video v-show="hasStream && !error" ref="videoRef" class="video-el" muted autoplay controls
-      @loadedmetadata="updateRect" @resize="updateRect" @error="error = '视频解码或连接失败，请检查预览地址与编码格式'" />
-    <div v-if="!hasStream || error" class="placeholder">
+      @loadedmetadata="updateRect" @resize="updateRect" @error="hasStream && (error = '视频解码或连接失败，请检查预览地址与编码格式')" />
+    <div v-if="(!hasStream && !showExample) || error || (showExample && imageError)" class="placeholder">
       <div class="cam-name">{{ name || '摄像头' }}</div>
-      <div class="cam-hint">{{ error || (online === false ? '设备离线' : '暂无预览流 · 检测采集与窗口预览分别配置') }}</div>
+      <div class="cam-hint">{{ imageError ? '示例图片加载失败，请刷新或检查本地资源' : error || (online === false ? '设备离线' : '暂无预览流 · 检测采集与窗口预览分别配置') }}</div>
     </div>
-    <div v-if="!error && (!hasStream || overlayRect)" class="overlay-viewport" :style="overlayStyle">
+    <div v-if="!showExample && !error && (!hasStream || overlayRect)" class="overlay-viewport" :style="overlayStyle">
       <RiskMaskOverlay :masks="masks" />
     </div>
   </div>
@@ -19,10 +22,13 @@ import { containRect } from '@/utils/videoGeometry'
 const props = defineProps({
   streamUrl: { type:String, default:'' }, name:{ type:String, default:'' },
   online:{ type:Boolean, default:true }, masks:{ type:Array, default:() => [] },
+  exampleImage:{type:String,default:''}, exampleSource:{type:String,default:''},
 })
 const videoRef = ref(null), wrapRef = ref(null), error = ref(''), overlayRect = ref(null)
 let flvPlayer, observer
 const hasStream = computed(() => Boolean(props.streamUrl))
+const imageError=ref(false)
+const showExample=computed(()=>!hasStream.value && Boolean(props.exampleImage))
 const overlayStyle = computed(() => overlayRect.value
   ? Object.fromEntries(Object.entries(overlayRect.value).map(([k,v]) => [k, v + 'px']))
   : { inset:'0' })
@@ -58,13 +64,15 @@ function initPlayer() {
 }
 onMounted(() => { observer = new ResizeObserver(updateRect); observer.observe(wrapRef.value); initPlayer() })
 watch(() => props.streamUrl, initPlayer)
+watch(() => props.exampleImage,()=>{imageError.value=false})
 onBeforeUnmount(() => { observer?.disconnect(); destroyPlayer() })
 </script>
 <style scoped>
-.video-player { position:relative; width:100%; height:100%; min-height:140px; background:#101820; overflow:hidden; border-radius:6px; }
+.video-player { position:relative; width:100%; height:100%; min-height:140px; background:var(--media-bg); overflow:hidden; border-radius:6px; }
+.example-image{display:block;width:100%;height:100%;object-fit:contain}.example-caption{position:absolute;top:0;left:0;right:0;padding:9px 12px;background:linear-gradient(#071c50ef,#071c5055);display:flex;gap:10px;align-items:center;justify-content:space-between;color:#e6f4ff;font-size:12px;pointer-events:none;z-index:1}.example-caption strong{font-weight:500}.example-caption span{font-size:10px;background:#154c48;color:#a5f4ca;padding:2px 6px;border:1px solid #408a78}.example-source{position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:#071c50d9;color:#d0e4ff;font-size:10px;line-height:1.5;pointer-events:none}
 .video-el { display:block; width:100%; height:100%; object-fit:contain; }
 .overlay-viewport { position:absolute; pointer-events:none; }
-.placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; background:#101820; color:#b8c6d2; }
+.placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; background:var(--media-bg); color:#b8c6d2; }
 .cam-name { font-size:14px; font-weight:600; margin-bottom:8px; color:#e2edf5; }
 .cam-hint { font-size:12px; text-align:center; line-height:1.7; }
 </style>

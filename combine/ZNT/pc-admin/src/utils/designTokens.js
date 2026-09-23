@@ -1,6 +1,6 @@
 /** Single palette for CSS, Ant Design and charts. Risk colors are not action colors. */
 const shared = {
-  'card-radius': '5px', 'product-ink': '#0a203c', 'media-bg': '#07182f',
+  'card-radius': '5px', 'product-ink': '#09255b', 'media-bg': '#09255b',
   'hero-accent': '#88e0ca', 'hero-text': '#f1f8fb', 'hero-muted': '#b2c8d2',
 }
 export const palettes = {
@@ -21,14 +21,14 @@ export const palettes = {
   },
   dark: {
     ...shared,
-    bg: '#071426', 'bg-2': '#0b1c33', surface: '#0e223d', 'surface-2': '#122b48',
-    'surface-muted': '#193652', 'border-color': '#294862',
+    bg: '#081f54', 'bg-2': '#0c2b66', surface: '#103677', 'surface-2': '#143e82',
+    'surface-muted': '#1b4b90', 'border-color': '#3867a6',
     'text-primary': '#e4effb', 'text-secondary': '#b4cce1', 'text-muted': '#99b5cd',
-    primary: '#60d6f0', 'primary-strong': '#91e7fa', 'primary-soft': '#163c54',
+    primary: '#60d6f0', 'primary-strong': '#91e7fa', 'primary-soft': '#194d86',
     'on-primary': '#062437', 'on-danger': '#3f0f18', link: '#79dff5', danger: '#ff8994', warning: '#f5be7a',
     caution: '#e8cf76', success: '#70d6ad', info: '#85bcef',
-    'sider-bg': '#091a30', 'sider-text': '#b4cce1', 'sider-muted': '#99b5cd',
-    'sider-active': '#163c54', 'sider-trigger': '#091a30', 'sider-trigger-hover': '#122b48',
+    'sider-bg': '#0a265f', 'sider-text': '#b4cce1', 'sider-muted': '#99b5cd',
+    'sider-active': '#194d86', 'sider-trigger': '#0a265f', 'sider-trigger-hover': '#143e82',
     'shadow-card': '0 2px 4px #00000008, 0 8px 28px #00000008',
     'shadow-float': '0 16px 48px #00000035',
     'chart-1': '#60d6f0', 'chart-2': '#85bcef', 'chart-3': '#d4b47b',

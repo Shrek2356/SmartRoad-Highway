@@ -4,4 +4,6 @@
 
 三维道路工作台使用 Three.js 0.186.0（MIT License，Copyright © 2010–2026 three.js authors）。许可证随前端构建保留在 `THREE-LICENSE.txt`，源码副本位于 `combine/ZNT/pc-admin/public/THREE-LICENSE.txt`。
 
+监控演示中的 4 张正常道路参考图来自用户已有 UA-DETRAC 测试档案，另 1 张为用户已有合成高速样例；图片不适用本项目代码许可证。文件来源和 SHA256 记录于 `combine/ZNT/pc-admin/public/media/road-monitor/provenance.json`。这些图片仅用于静态界面展示，不是乐西高速现场拍摄或新的检测结果。
+
 最终提交代码未包含早期调研中已淘汰的异常检测框架实现；项目技术贡献按实际交付的 MLLM、视觉定位、证据核验和 Agent 工作流说明。
