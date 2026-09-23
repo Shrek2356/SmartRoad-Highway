@@ -17,6 +17,7 @@
 <script setup>
 import { h, onMounted, reactive, ref } from 'vue'
 import { Modal, message } from 'ant-design-vue'
+import { popupContainer } from '@/utils/displayPreferences'
 import { createBackup, createUser, fetchUsers, updateUserPassword, updateUserRole } from '@/api/agentCenter'
 import WorkspaceBackup from './WorkspaceBackup.vue'
 const users = ref([]), userOpen = ref(false), newUser = reactive({ username:'', password:'', role:'safety_officer' })
@@ -24,7 +25,7 @@ const userColumns = [{ title: '用户名', dataIndex: 'username' }, { title: '�
 async function loadUsers() { try { users.value = (await fetchUsers()).data } catch(e) { message.error(e.message || '用户列表读取失败') } }
 async function addUser() { await createUser(newUser); message.success('用户已创建'); userOpen.value = false; Object.assign(newUser, { username: '', password: '', role: 'safety_officer' }); await loadUsers() }
 async function changeRole(record, role) { await updateUserRole(record.username, role); message.success('角色已更新'); await loadUsers() }
-function resetPassword(record) { let password = ''; Modal.confirm({ title: `重置 ${record.username} 的密码`, content: () => h('input', { class: 'ant-input', type: 'password', placeholder: '至少6位', onInput: (e) => { password = e.target.value } }), onOk: async () => { await updateUserPassword(record.username, password); message.success('密码已更新') } }) }
+function resetPassword(record) { let password = ''; Modal.confirm({ getContainer:popupContainer, title: `重置 ${record.username} 的密码`, content: () => h('input', { class: 'ant-input', type: 'password', placeholder: '至少6位', onInput: (e) => { password = e.target.value } }), onOk: async () => { await updateUserPassword(record.username, password); message.success('密码已更新') } }) }
 async function backup() { const res = await createBackup(); message.success(`备份完成：${res.data.backup}`) }
 onMounted(loadUsers)
 </script>

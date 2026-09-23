@@ -71,6 +71,7 @@ import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { exportAnalysisReport, fetchAnalysisData } from '@/api/analysis'
 import { colorTheme } from '@/utils/theme'
+import { fontPercent } from '@/utils/displayPreferences'
 import { chartTheme } from '@/utils/designTokens'
 import { useUserStore } from '@/stores/user'
 import { createRequestGate } from '@/utils/requestGate'
@@ -154,12 +155,12 @@ function renderCharts() {
     charts.forEach((c) => c.dispose())
     charts = []
 
-    const visual = chartTheme(colorTheme.value)
+    const visual = chartTheme(colorTheme.value, fontPercent.value/100)
     const chartText = visual.text
     const chartGrid = visual.grid
-    const titleStyle = { color: chartText, fontSize: 14, fontWeight: 600 }
+    const titleStyle = { color: chartText, fontSize: Math.round(14*fontPercent.value/100), fontWeight: 600 }
     const axisLine = { lineStyle: { color: chartGrid } }
-    const axisLabel = { color: chartText }
+    const axisLabel = { color: chartText, fontSize:visual.fontSize }
 
     const t = echarts.init(trendRef.value)
     charts.push(t)
@@ -167,7 +168,7 @@ function renderCharts() {
       backgroundColor: 'transparent',
       title: { text: `隐患趋势（${rangeMeta.value.days || trend.dates.length}天）`, textStyle: titleStyle },
       tooltip: { ...visual.tooltip, trigger: 'axis' },
-      legend: { data: ['高危', '中危', '低危'], textStyle: { color: chartText } },
+      legend: { data: ['高危', '中危', '低危'], textStyle: { color: chartText, fontSize:visual.fontSize } },
       grid: { left: 40, right: 16, top: 48, bottom: 28 },
       xAxis: { type: 'category', data: trend.dates, axisLine, axisLabel },
       yAxis: { type: 'value', minInterval: 1, axisLine, axisLabel, splitLine: { lineStyle: { color: chartGrid } } },
@@ -354,7 +355,7 @@ onMounted(() => {
     resizeObserver.observe(reportRef.value)
   }
 })
-watch(colorTheme, () => {
+watch([colorTheme,fontPercent], () => {
   renderCharts()
 })
 watch(() => userStore.project?.id, () => loadData())

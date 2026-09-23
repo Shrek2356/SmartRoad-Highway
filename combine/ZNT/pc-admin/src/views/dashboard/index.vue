@@ -157,6 +157,7 @@ import { useUserStore } from '@/stores/user'
 import { JR, TEAM_NAME, metricMood } from '@/utils/jr'
 import { subscribeModules } from '@/utils/moduleBus'
 import { colorTheme } from '@/utils/theme'
+import { fontPercent } from '@/utils/displayPreferences'
 import { chartTheme } from '@/utils/designTokens'
 import { workspaceStyle } from '@/utils/preferences'
 import { canVisit } from '@/utils/guidance'
@@ -226,7 +227,7 @@ function openVideoCase(v) {
 
 
 function renderCharts() {
-  const visual = chartTheme(colorTheme.value)
+  const visual = chartTheme(colorTheme.value, fontPercent.value/100)
   const chartText = visual.text
   const chartGrid = visual.grid
 
@@ -234,11 +235,11 @@ function renderCharts() {
     if (!trendChart) trendChart = echarts.init(trendRef.value)
     trendChart.setOption({
       backgroundColor: 'transparent',
-      title: { text: '风险时段分布', textStyle: { fontSize: 13, color: chartText } },
+      title: { text: '风险时段分布', textStyle: { fontSize: Math.round(13*fontPercent.value/100), color: chartText } },
       tooltip: { ...visual.tooltip, trigger: 'axis' },
       grid: { left: 40, right: 16, top: 36, bottom: 24 },
-      xAxis: { type: 'category', data: riskTrend.value.hours, axisLabel: { color: chartText }, axisLine: { lineStyle: { color: chartGrid } } },
-      yAxis: { type: 'value', minInterval: 1, axisLabel: { color: chartText }, splitLine: { lineStyle: { color: chartGrid } } },
+      xAxis: { type: 'category', data: riskTrend.value.hours, axisLabel: { color: chartText, fontSize:visual.fontSize }, axisLine: { lineStyle: { color: chartGrid } } },
+      yAxis: { type: 'value', minInterval: 1, axisLabel: { color: chartText, fontSize:visual.fontSize }, splitLine: { lineStyle: { color: chartGrid } } },
       series: [{
         type: 'line',
         smooth: true,
@@ -253,7 +254,7 @@ function renderCharts() {
     if (!pieChart) pieChart = echarts.init(pieRef.value)
     pieChart.setOption({
       backgroundColor: 'transparent',
-      title: { text: '隐患类型占比', textStyle: { fontSize: 13, color: chartText } },
+      title: { text: '隐患类型占比', textStyle: { fontSize: Math.round(13*fontPercent.value/100), color: chartText } },
       tooltip: { ...visual.tooltip, trigger: 'item' },
       series: [{
         type: 'pie',
@@ -262,13 +263,13 @@ function renderCharts() {
           ...item,
           itemStyle: { color: visual.colors[index % visual.colors.length] },
         })),
-        label: { fontSize: 11, color: chartText },
+        label: { fontSize: Math.round(11*fontPercent.value/100), color: chartText },
       }],
     }, true)
   }
 }
 
-watch(colorTheme, async () => {
+watch([colorTheme,fontPercent], async () => {
   await nextTick()
   renderCharts()
 })

@@ -3,6 +3,8 @@
     <h2>系统设置</h2><p>集中管理桌面环境、展示方式、用户与备份。模型权重及云端连接在模型规则配置中维护。</p>
     <a-tabs v-model:activeKey="tab">
       <a-tab-pane key="workspace" tab="工作台与展示">
+        <ReadingSettings />
+        <a-divider />
         <a-form layout="vertical" class="settings-form">
           <a-form-item label="界面风格"><a-radio-group :value="workspaceStyle" @change="e => setWorkspaceStyle(e.target.value)"><a-radio-button value="professional">专业工作台</a-radio-button><a-radio-button value="showcase">作品展示视图</a-radio-button></a-radio-group></a-form-item>
           <a-form-item label="预置展示素材"><a-switch :checked="presentationAssets" :disabled="!presentationAvailable" @change="toggleAssets" /> <span>{{ presentationAvailable ? '显示预编辑的八个案例、展示点位和成果图' : '当前构建已禁用预置素材，请联系部署者调整。' }}</span></a-form-item>
@@ -33,6 +35,7 @@ import { onMounted, onBeforeUnmount, reactive, ref } from 'vue'
 import { useRouteTab } from '@/composables/useRouteTab'
 import { message } from 'ant-design-vue'
 import SystemAdministration from '@/components/SystemAdministration.vue'
+import ReadingSettings from '@/components/ReadingSettings.vue'
 import { workspaceStyle, setWorkspaceStyle, presentationAssets, presentationAvailable, setPresentationAssets } from '@/utils/preferences'
 import { getBusinessApiBase, getDetectApiBase, saveEndpointSettings, resetEndpointSettings } from '@/utils/endpoints'
 import { refreshServiceHealth } from '@/composables/useServiceHealth'

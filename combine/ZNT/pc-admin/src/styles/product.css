@@ -31,3 +31,27 @@
 .login-shell,.login-page .animation-stage,.login-page .module-group { border-radius:6px!important; }
 @media(max-width:1150px) { .industrial-label { display:none; } }
 @media(max-width:1000px) { .page-card { padding:18px; } .ant-drawer-content-wrapper { max-width:100vw; } }
+
+/* Larger type may wrap; inspection zoom never changes these layout dimensions. */
+:root[data-large-text=true] .basic-layout .header { height:auto;min-height:72px;padding-block:12px;gap:16px;flex-wrap:wrap; }
+:root[data-large-text=true] .basic-layout .header-right { flex-wrap:wrap; }
+:root[data-large-text=true] .basic-layout .industrial-label { display:none; }
+:root[data-large-text=true] .basic-layout .ant-menu-item { height:auto;min-height:calc(34px * var(--ui-font-scale));line-height:1.5;padding-block:7px; }
+:root[data-large-text=true] .basic-layout .ant-menu-title-content { white-space:normal; }
+:root[data-large-text=true] .basic-layout .ant-menu-item-group-title { line-height:1.6; }
+:root[data-large-text=true] .highway-dashboard :is(.overview-heading,h1,.detail-meta,.overview-filters,.heading-actions) { flex-wrap:wrap; }
+:root[data-large-text=true] .highway-dashboard .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+:root[data-large-text=true] .highway-dashboard .panel-heading { height:auto;min-height:49px;padding-block:12px;flex-wrap:wrap; }
+:root[data-large-text=true] .highway-dashboard .detail-body { height:auto;min-height:590px; }
+:root[data-large-text=true] .highway-dashboard .scene-header { height:auto;min-height:49px;padding-block:12px;flex-wrap:wrap;gap:8px; }
+:root[data-large-text=true] .highway-dashboard .scene-header>div { flex-wrap:wrap; }
+:root[data-large-text=true] .highway-dashboard .device-table td { white-space:normal; }
+:root[data-large-text=true] .monitor-page { height:auto; }
+:root[data-large-text=true] .monitor-page .body { min-height:500px; }
+:root[data-large-text=true] .monitor-page :is(.left-tree,.right-alarm) { width:calc(190px * min(var(--ui-font-scale),1.4)); }
+:root[data-large-text=true] .page-location { flex-wrap:wrap; }
+:root[data-large-text=true] .login-page { height:100vh;min-height:0;align-items:start;overflow-y:auto;padding-bottom:90px; }
+:root[data-large-text=true] .login-page .role-group .ant-radio-button-wrapper { height:auto;min-height:36px;line-height:1.5;padding-block:6px;white-space:normal; }
+:root[data-large-text=true] .login-page .login-button { height:auto;min-height:46px;padding-block:10px; }
+:root[data-large-text=true] .login-page .module-chip { white-space:normal;flex-wrap:wrap; }
+.basic-layout .content { padding-bottom:90px; }

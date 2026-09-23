@@ -4,7 +4,8 @@
  */
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import Antd from 'ant-design-vue'
+import Antd, { message,notification } from 'ant-design-vue'
+import { popupContainer } from './utils/displayPreferences'
 import 'ant-design-vue/dist/reset.css'
 import App from './App.vue'
 import router from './router'
@@ -13,6 +14,8 @@ import './styles/product.css'
 import './styles/ink-light.css'
 
 const app = createApp(App)
+message.config({getContainer:popupContainer})
+notification.config({getContainer:popupContainer})
 
 app.use(createPinia())
 app.use(router)

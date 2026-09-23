@@ -34,7 +34,7 @@ test('actual analysis loader ignores old project responses and responses after u
   const code = source.slice(source.indexOf('async function loadData()'), source.indexOf('async function onExport()'))
   const ref = value=>({value}), pending=[]
   let project='A', renders=0
-  const requests=createRequestGate(), state={loading:ref(false),loadError:ref(''),analysisPresentation:ref(false),sourceNote:ref(''),analysisEmpty:ref(false),rangeMeta:ref({}),trendRef:ref({}),heatRef:ref({}),teamRef:ref({}),colorTheme:ref('dark')}
+  const requests=createRequestGate(), state={loading:ref(false),loadError:ref(''),analysisPresentation:ref(false),sourceNote:ref(''),analysisEmpty:ref(false),rangeMeta:ref({}),trendRef:ref({}),heatRef:ref({}),teamRef:ref({}),colorTheme:ref('dark'),fontPercent:ref(100)}
   const dependencies={...state,requests,charts:[],lastData:null,fetchAnalysisData:()=>new Promise(resolve=>pending.push(resolve)),queryParams:()=>({projectId:project}),nextTick:async()=>{},chartTheme:()=>({}),echarts:{init:node=>{assert.ok(node);renders++;return {setOption(){},dispose(){}}}}}
   const load=new Function(...Object.keys(dependencies),code+';return loadData;')(...Object.values(dependencies))
   const data = p=>({data:{trend:{dates:['day'],red:[1],orange:[0],yellow:[0]},areaHeat:[],teamViolation:[],range:{start:p,end:p,days:1}}})
@@ -43,7 +43,7 @@ test('actual analysis loader ignores old project responses and responses after u
   assert.equal(state.rangeMeta.value.start,'B');assert.equal(renders,3)
   const c=load();requests.dispose();state.trendRef.value=null;pending[2](data('C'));await c
   assert.equal(renders,3)
-  assert.doesNotMatch(source.slice(source.indexOf('watch(colorTheme'),source.indexOf('watch(() => userStore')),/loadData/)
+  assert.doesNotMatch(source.slice(source.indexOf('watch([colorTheme,fontPercent]'),source.indexOf('watch(() => userStore')),/loadData/)
 })
 
 test('threshold save failure restores the persisted value and does not claim success', async () => {

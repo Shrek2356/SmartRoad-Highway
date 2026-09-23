@@ -12,7 +12,7 @@
     <a-table :data-source="items" :columns="columns" row-key="job_id" :loading="loading" :pagination="false" :scroll="{ x: 950 }">
       <template #emptyText><a-empty :description="error ? '暂时无法读取任务，请先恢复连接' : status ? '这个状态下还没有任务' : '还没有检测任务，从一张图片开始吧'"><a-button v-if="!error && !status" @click="router.push('/realtime-detect')">新建检测</a-button><a-button v-else-if="status && !error" @click="status='';resetPage()">查看全部状态</a-button></a-empty></template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'image'"><a-image v-if="record.input_image" :src="record.input_image" :width="112" alt="历史检测原图" /></template>
+        <template v-if="column.key === 'image'"><a-image v-if="record.input_image" :src="record.input_image" :width="112" :preview="{getContainer:popupContainer}" alt="历史检测原图" /></template>
         <template v-else-if="column.key === 'sample'"><div>{{ record.archive?.sample_id || record.job_id }}</div><small>{{ record.archive?.dataset || '' }}</small><a-tag v-if="record.archived" color="blue">已归档留存</a-tag></template>
         <template v-else-if="column.key === 'status'"><a-tag :color="colors[record.status]">{{ labels[record.status] || record.status }}</a-tag></template>
         <template v-else-if="column.key === 'profile'">{{ { demo:'演示', offline:'本地离线', standard:'云端', archive:'历史导入' }[record.profile] || record.profile }}</template>
@@ -26,7 +26,7 @@
           </a-space>
         </template>
       </template>
-      <template #expandedRowRender="{ record }"><p v-if="record.archive?.batch_title">{{ record.archive.batch_title }} · 导入时间：{{ record.archive.imported_at }}</p><a-image v-if="record.preview_image" :src="record.preview_image" :width="320" alt="历史标注图" /><p>{{ record.error || '查看过程与结果可获取原图、各风险掩码和报告。历史导入保留原检测结论，不代表人工已确认。' }}</p></template>
+      <template #expandedRowRender="{ record }"><p v-if="record.archive?.batch_title">{{ record.archive.batch_title }} · 导入时间：{{ record.archive.imported_at }}</p><a-image v-if="record.preview_image" :src="record.preview_image" :width="320" :preview="{getContainer:popupContainer}" alt="历史标注图" /><p>{{ record.error || '查看过程与结果可获取原图、各风险掩码和报告。历史导入保留原检测结论，不代表人工已确认。' }}</p></template>
     </a-table>
     <a-space style="margin-top:16px"><a-button :disabled="page === 0 || loading" @click="page--; load()">上一页</a-button><span>第 {{ page + 1 }} 页</span><a-button :disabled="items.length < pageSize || loading" @click="page++; load()">下一页</a-button></a-space>
   </div>
@@ -34,6 +34,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { popupContainer } from '@/utils/displayPreferences'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import { fetchTaskPage, cancelDetectJob, retryDetectJob, importDetectionArchive, archiveDetectJob } from '@/api/detect'

@@ -56,12 +56,13 @@ export function antTokens(mode) {
   }
 }
 
-export function chartTheme(mode) {
+export function chartTheme(mode, fontScale = 1) {
   const p = paletteFor(mode)
   return {
     text: p['text-secondary'], grid: p['border-color'], primary: p.primary,
+    fontSize: Math.round(12 * fontScale),
     danger: p.danger, warning: p.warning, caution: p.caution,
     colors: [1, 2, 3, 4, 5].map(i => p[`chart-${i}`]),
-    tooltip: { backgroundColor: p.surface, borderColor: p['border-color'], textStyle: { color: p['text-primary'], fontSize: 12 }, extraCssText: 'border-radius:10px;box-shadow:' + p['shadow-float'] },
+    tooltip: { backgroundColor: p.surface, borderColor: p['border-color'], textStyle: { color: p['text-primary'], fontSize: Math.round(12 * fontScale) }, extraCssText: 'border-radius:10px;box-shadow:' + p['shadow-float'] },
   }
 }

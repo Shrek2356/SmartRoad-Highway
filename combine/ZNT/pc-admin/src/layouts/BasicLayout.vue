@@ -2,7 +2,7 @@
   <a-layout class="basic-layout">
     <a class="skip-content" href="#main-content">跳转到页面内容</a>
     <!-- 侧边栏 -->
-    <a-layout-sider v-model:collapsed="collapsed" collapsible :theme="colorTheme" width="224">
+    <a-layout-sider v-model:collapsed="collapsed" collapsible :theme="colorTheme" :width="Math.round(224*Math.min(fontPercent/100,1.4))">
       <div class="logo">
         <SafetyCertificateOutlined class="brand-symbol" />
         <span v-if="!collapsed" class="logo-full">
@@ -97,6 +97,7 @@ import RuntimeStatus from '@/components/RuntimeStatus.vue'
 import { workspaceStyle, setWorkspaceStyle } from '@/utils/preferences'
 import ProductGuide from '@/components/ProductGuide.vue'
 import { pageFor } from '@/utils/guidance'
+import { fontPercent } from '@/utils/displayPreferences'
 
 const iconMap = {
   DashboardOutlined,

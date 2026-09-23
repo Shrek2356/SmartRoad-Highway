@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { tmpdir } from 'os'
+import fontScale from './scripts/fontScale.js'
 
 /**
  * Vite 配置
@@ -9,6 +10,7 @@ import { tmpdir } from 'os'
  */
 export default defineConfig({
   plugins: [vue()],
+  css: { postcss: { plugins: [fontScale()] } },
   cacheDir: resolve(tmpdir(), 'smartroad-pc-admin-vite-cache'),
   resolve: {
     alias: {
