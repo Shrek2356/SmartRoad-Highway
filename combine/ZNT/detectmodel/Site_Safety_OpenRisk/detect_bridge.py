@@ -357,9 +357,36 @@ class DetectBridge:
             out_dir = self.jobs_root / job_id
             summary = out_dir / "bridge_summary.json"
             if summary.is_file():
-                return json.loads(summary.read_text(encoding="utf-8"))
-            raise KeyError(job_id)
-        return job
+                job = json.loads(summary.read_text(encoding="utf-8"))
+            else:
+                raise KeyError(job_id)
+        return self._with_reference_record(job, job_id)
+
+    def _with_reference_record(self, job: dict, job_id: str) -> dict:
+        """Expose the saved snapshot without re-querying today's KB or editing archives."""
+        if not isinstance(job.get('result'), dict):
+            return job
+        result = dict(job['result'])
+        record = self.jobs_root / job_id / 'regulatory_references.json'
+        result['regulatory_references'] = None
+        result['reference_record_status'] = 'unavailable'
+        if record.is_file():
+            try:
+                payload = json.loads(record.read_text(encoding='utf-8'))
+                if not isinstance(payload, dict) or not isinstance(payload.get('references'), dict):
+                    raise ValueError('Invalid reference snapshot')
+                retrievals = payload.get('retrievals') or {}
+                if not isinstance(retrievals, dict):
+                    raise ValueError('Invalid retrieval snapshot')
+                result['risks'] = [dict(risk,
+                    knowledge_retrieval=retrievals.get(risk.get('risk_id'), risk.get('knowledge_retrieval', {})),
+                    knowledge_references=payload['references'].get(risk.get('risk_id'), risk.get('knowledge_references', [])))
+                    for risk in result.get('risks', [])]
+                result['regulatory_references'] = self._media_url(job_id, record.name)
+                result['reference_record_status'] = 'recorded'
+            except (OSError, ValueError, TypeError):
+                result['reference_record_status'] = 'invalid'
+        return {**job, 'result': result}
 
     def recent(self, limit: int = 20, offset: int = 0, status: str = "", archived_only: bool = False) -> list:
         with self.lock:
@@ -980,6 +1007,7 @@ class DetectBridge:
                         "description": r.get("risk_description") or "",
                         "suggestions": r.get("disposal_recommendations") or [],
                         "knowledge_references": r.get("knowledge_references") or [],
+                        "knowledge_retrieval": r.get("knowledge_retrieval") or {},
                         "overlay": self._media_url(job["job_id"], Path(geom["overlay_path"]).name)
                         if geom.get("overlay_path")
                         else None,

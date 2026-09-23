@@ -231,6 +231,7 @@
               <a-alert v-if="job.result.assessment_quality?.issues?.length" type="info" show-icon
                 message="画面可判断范围" :description="job.result.assessment_quality.issues.join('；')" />
               <p v-if="job.result.issue_report"><a :href="job.result.issue_report" target="_blank" rel="noopener">查看自动问题报告与证据记录</a></p>
+              <a-button class="reference-button" @click="referencesOpen = true">规范参考记录 · {{ referenceCount(job.result) }} 条关联引用</a-button>
               <div v-if="job.result.screening" class="screening-summary">
                 <a-tag :color="job.result.screening.triggered ? 'orange' : 'default'">
                   YOLO {{ job.result.screening.triggered ? '已触发' : '未触发' }}
@@ -320,23 +321,6 @@
                     <div v-for="reason in risk.evidence_state.review_reasons || []" :key="reason">{{ reason }}</div>
                   </template>
                 </a-alert>
-                <a-alert
-                  v-if="risk.knowledge_references?.length"
-                  type="info"
-                  show-icon
-                  class="rag-reference"
-                  :message="`${risk.name} · RAG规范依据`"
-                >
-                  <template #description>
-                    <div v-for="ref in risk.knowledge_references" :key="ref.chunk_id">
-                      <strong>{{ ref.title || ref.source_file }} · {{ ref.section }}</strong>
-                      <p>{{ ref.version }}；{{ ref.applicability }}</p>
-                      <a v-if="ref.source_url?.startsWith('https://')" :href="ref.source_url" target="_blank" rel="noopener noreferrer">查看官方原文</a>
-                      <p>处置参考，需人工确认适用条件；不构成违法认定。</p>
-                      <span>（相关度 {{ ref.score }}）</span>：{{ ref.text }}
-                    </div>
-                  </template>
-                </a-alert>
               </div>
             </template>
             <div v-else class="empty">等待检测完成…</div>
@@ -345,6 +329,7 @@
       </a-col>
     </a-row>
 
+    <RegulatoryReferenceDialog v-model:open="referencesOpen" :job="job" />
     <a-modal v-model:open="codeOpen" title="算法源码与启动" :footer="null" width="680px">
       <p>目录：<code class="path">detectmodel/Site_Safety_OpenRisk/</code></p>
       <pre class="code">cd detectmodel/Site_Safety_OpenRisk
@@ -380,6 +365,8 @@ import {
 import { EXAMPLE_CASES } from '@/mock/examples'
 import { syncDetectJobToWorkOrders } from '@/utils/detectWorkOrders'
 import { syncDetectJobToResults } from '@/utils/detectResults'
+import { referenceCount } from '@/utils/regulatoryReferences'
+import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
 
 const route = useRoute()
 const user = useUserStore()
@@ -477,6 +464,7 @@ const auditIntervalMinutes = ref(30)
 const job = ref(null)
 const recent = ref([])
 const codeOpen = ref(false)
+const referencesOpen = ref(false)
 const preview = ref('')
 const previewOpen = ref(false)
 const camOn = ref(false)

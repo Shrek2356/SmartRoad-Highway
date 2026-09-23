@@ -2,9 +2,9 @@
 
 面向高速公路建设与管理的道路风险检测实验室原型，集道路概况、摄像头查看、图像风险分析、带图报告和历史档案于一体。系统通过 Qwen 观察与复核、SAM3 多概念定位及道路法规检索，把图像中的风险线索转为可追溯、可人工复核的管理记录。当前重点验证服务器端分析，端侧实时模型暂缓训练。
 
-[下载 Windows 安装包 v1.4.6](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.6/SmartRoad-Inspection_Setup_v1.4.6_x64.exe) · [安装与验证](docs/validation/v1.4.6/README.md) · [项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html)
+[下载 Windows 安装包 v1.4.7](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.7/SmartRoad-Inspection_Setup_v1.4.7_x64.exe) · [安装与验证](docs/validation/v1.4.7/README.md) · [项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html)
 
-> **版本说明：** 最新安装包 **v1.4.6** 已包含下方展示的深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大功能，可直接下载安装。基础包自带界面与服务运行时；真实检测所需模型权重及 GPU 环境另行配置。项目仍处于实验室小试阶段。
+> **版本说明：** 最新安装包 **v1.4.7** 已包含下方展示的深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大，以及图像检测的规范参考记录功能，可直接下载安装。基础包自带界面与服务运行时；真实检测所需模型权重及 GPU 环境另行配置。项目仍处于实验室小试阶段。
 
 ## 应用能做什么
 
@@ -14,6 +14,7 @@
 | 摄像头监控 | 从设备列表双击摄像头名称进入对应画面，支持单画面及多分栏；演示图片与真实设备入口分开。 |
 | 道路风险检测 | 提交图片，观察风险候选、同图多标签、目标定位与复核结果；区分普通湿路和可见积水侵占道路。 |
 | 问题报告与历史档案 | 按风险关联原图、标注、掩码和处理建议；导入或归档历史检测，保留原始证据与未确认状态。 |
+| 规范参考记录 | 将检测图像与保存的法规条款并排查看，按异常标签切换原文、适用条件和来源；新检测记录检索词与时间。 |
 | 界面与阅读设置 | 切换深蓝工业风格／黑白水墨风格；调整字号并保存，或保持布局整体放大查看细节。 |
 
 ## 界面与操作介绍
@@ -54,7 +55,15 @@
 | --- | --- |
 | ![设置页面选择150%字号，支持100%到200%](docs/images/reading-font-150.png) | ![监控图片整体放大，工具条支持缩放和退出](docs/images/reading-monitor-zoom.png) |
 
-[查看字号与放大操作、验证记录](docs/READING_AND_ZOOM.md)。本轮前端测试 42 项通过，已实测字号保存、滚轮缩放、平移、Esc 恢复、指南弹窗及摄像头图片联动；这些界面验证不构成新的模型检测性能结论。
+[查看字号与放大操作、验证记录](docs/READING_AND_ZOOM.md)。字号与放大功能已实测字号保存、滚轮缩放、平移、Esc 恢复、指南弹窗及摄像头图片联动；v1.4.7 前端测试共 45 项通过，这些界面验证不构成新的模型检测性能结论。
+
+### 图像检测的 RAG 规范参考
+
+在实时检测结果或历史档案中打开 **规范参考**，可并排查看原图、场景标注及各异常关联的条款原文、版本、适用条件和来源。下图为历史 S07 的实际保存记录；新检测还保存检索词、检索时间及条款范围，历史缺失字段明确标记，不补造。
+
+![异常图像与其规范参考记录](docs/images/rag-reference-blue.png)
+
+正常图像没有异常关联引用。法规文本相关度不等于检测置信度，条款供处置条件核查使用。[查看功能说明与水墨／正常场景截图](docs/RAG_REFERENCE_RECORDS.md)。
 
 ## 快速体验与资料
 
@@ -64,7 +73,7 @@
 4. 查看已有带图报告与历史档案；运行新的真实检测前，按部署说明配置模型及服务。
 
 - [完整带图报告 HTML](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html) · [报告与原始附件 ZIP](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-bundle-20260922.zip)
-- [v1.4.6 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.6) · [安装与档案保留验证](docs/validation/v1.4.6/README.md)
+- [v1.4.7 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.7) · [安装与档案保留验证](docs/validation/v1.4.7/README.md)
 - [检测历史与原图归档](docs/DETECTION_HISTORY.md)：历史原图、标注、掩码及报告导入与长期留存。
 - [环境部署说明](combine/ZNT/requirements/README.md) · [v1.4.4 模型测试与验证摘要](docs/validation/v1.4.4/README.md)
 - [道路领域迁移检查](combine/ZNT/docs/道路领域全面迁移检查_20260921.md)

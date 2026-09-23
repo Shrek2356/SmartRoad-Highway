@@ -235,6 +235,7 @@ function rewriteMediaUrls(result) {
     ...result,
     input_image: fix(result.input_image),
     issue_report: fix(result.issue_report),
+    regulatory_references: fix(result.regulatory_references),
     scene_annotation: fix(result.scene_annotation),
     overlays: (result.overlays || []).map(fix),
     masks: (result.masks || []).map(fix),

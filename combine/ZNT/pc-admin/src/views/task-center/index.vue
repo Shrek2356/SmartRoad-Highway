@@ -20,6 +20,7 @@
         <template v-else-if="column.key === 'action'">
           <a-space>
             <a-button size="small" @click="router.push({ path:'/realtime-detect', query:{ job: record.job_id } })">过程与结果</a-button>
+            <a-button v-if="record.status === 'done'" size="small" @click="referenceJobId = record.job_id; referencesOpen = true">规范参考</a-button>
             <a-button v-if="canOperate && record.status === 'done' && !record.archived" size="small" :loading="busy === record.job_id" @click="retain(record)">归档留存</a-button>
             <a-button v-if="canOperate && record.status === 'queued'" size="small" danger :loading="busy === record.job_id" @click="act(record, false)">取消排队</a-button>
             <a-popconfirm v-if="canOperate && ['error','cancelled'].includes(record.status)" title="将重新推理并生成新任务，是否继续？" @confirm="act(record, true)"><a-button size="small" :loading="busy === record.job_id">重新检测</a-button></a-popconfirm>
@@ -29,6 +30,7 @@
       <template #expandedRowRender="{ record }"><p v-if="record.archive?.batch_title">{{ record.archive.batch_title }} · 导入时间：{{ record.archive.imported_at }}</p><a-image v-if="record.preview_image" :src="record.preview_image" :width="320" :preview="{getContainer:popupContainer}" alt="历史标注图" /><p>{{ record.error || '查看过程与结果可获取原图、各风险掩码和报告。历史导入保留原检测结论，不代表人工已确认。' }}</p></template>
     </a-table>
     <a-space style="margin-top:16px"><a-button :disabled="page === 0 || loading" @click="page--; load()">上一页</a-button><span>第 {{ page + 1 }} 页</span><a-button :disabled="items.length < pageSize || loading" @click="page++; load()">下一页</a-button></a-space>
+    <RegulatoryReferenceDialog v-model:open="referencesOpen" :job-id="referenceJobId" />
   </div>
 </template>
 <script setup>
@@ -37,10 +39,12 @@ import { useRouter } from 'vue-router'
 import { popupContainer } from '@/utils/displayPreferences'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
+import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
 import { fetchTaskPage, cancelDetectJob, retryDetectJob, importDetectionArchive, archiveDetectJob } from '@/api/detect'
 const router = useRouter(), user = useUserStore()
 const items = ref([]), status = ref(''), error = ref(''), loading = ref(false), busy = ref(''), page = ref(0)
 const importing = ref(false), importMessage = ref(''), archivedOnly = ref(false)
+const referencesOpen = ref(false), referenceJobId = ref('')
 const pageSize = 20, canOperate = computed(() => ['admin','safety'].includes(user.role))
 const labels = { queued:'排队中', running:'执行中', done:'已完成', error:'失败', cancelled:'已取消' }
 const colors = { queued:'gold', running:'blue', done:'green', error:'red', cancelled:'default' }
@@ -48,7 +52,7 @@ const columns = [
   { title:'原图', key:'image', width:135 }, { title:'任务 / 样本', key:'sample', width:255 }, { title:'状态', key:'status', width:100 },
   { title:'模式', key:'profile', width:100 }, { title:'设备', dataIndex:'device_id', width:120 },
   { title:'原检测时间', dataIndex:'created_at', width:195 }, { title:'处理耗时', key:'elapsed', width:110 },
-  { title:'操作', key:'action', width:240 },
+  { title:'操作', key:'action', width:330 },
 ]
 let timer, disposed = false
 async function load() {

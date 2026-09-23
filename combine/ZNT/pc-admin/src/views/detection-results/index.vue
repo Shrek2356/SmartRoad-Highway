@@ -76,6 +76,7 @@
                   type="link"
                   @click="preview(c.images.original)"
                 >查看原图</a-button>
+                <a-button v-if="c.detectJobId && !c.presentationAsset" type="link" @click="referenceJobId = c.detectJobId; referencesOpen = true">规范参考</a-button>
               </div>
             </div>
           </div>
@@ -86,6 +87,7 @@
       <p class="conclusion">{{ summary.conclusion }}</p>
     </div>
 
+    <RegulatoryReferenceDialog v-model:open="referencesOpen" :job-id="referenceJobId" />
     <a-modal v-model:open="originOpen" title="结果由来" width="720px" :footer="null">
       <p class="origin-summary">{{ origin.summary }}</p>
       <div class="flow">
@@ -122,6 +124,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { fetchDetectionResults } from '@/api/detectionResults'
 import { subscribeModules } from '@/utils/moduleBus'
+import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -134,6 +137,7 @@ const originOpen = ref(false)
 const codeOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
+const referencesOpen = ref(false), referenceJobId = ref('')
 
 const confirmedCount = computed(() => cases.value.filter((c) => c.autoConfirm).length)
 const reviewCount = computed(() => cases.value.filter((c) => !c.presentationAsset && c.humanReview).length)

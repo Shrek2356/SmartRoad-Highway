@@ -25,6 +25,7 @@ test('automatic road report links follow the selected detection gateway', async 
   const endpointsUrl = 'data:text/javascript;base64,'+Buffer.from(endpointSource).toString('base64')
   const source = (await readFile(new URL('../src/api/detect.js', import.meta.url),'utf8')).replace(/^import .*$/gm, '')
   const fixture = { result:{ issue_report:'/api/detect/jobs/JOB-QA/media/issue_report.md',
+    regulatory_references:'/api/detect/jobs/JOB-QA/media/regulatory_references.json',
     scene_annotation:'/api/detect/jobs/JOB-QA/media/scene_annotation.png',
     input_image:'/api/detect/jobs/JOB-QA/media/input.png' } }
   const api = await import('data:text/javascript;base64,'+Buffer.from(
@@ -33,10 +34,12 @@ test('automatic road report links follow the selected detection gateway', async 
   ).toString('base64'))
   let job = await api.fetchDetectJob('JOB-QA')
   assert.equal(job.result.issue_report,'/detect-api/api/detect/jobs/JOB-QA/media/issue_report.md')
+  assert.equal(job.result.regulatory_references,'/detect-api/api/detect/jobs/JOB-QA/media/regulatory_references.json')
   assert.equal(job.result.scene_annotation,'/detect-api/api/detect/jobs/JOB-QA/media/scene_annotation.png')
   stored.set('znt_detect_api','http://127.0.0.1:8810')
   job = await api.fetchDetectJob('JOB-QA')
   assert.equal(job.result.issue_report,'http://127.0.0.1:8810/api/detect/jobs/JOB-QA/media/issue_report.md')
+  assert.equal(job.result.regulatory_references,'http://127.0.0.1:8810/api/detect/jobs/JOB-QA/media/regulatory_references.json')
   assert.equal(job.result.scene_annotation,'http://127.0.0.1:8810/api/detect/jobs/JOB-QA/media/scene_annotation.png')
 })
 

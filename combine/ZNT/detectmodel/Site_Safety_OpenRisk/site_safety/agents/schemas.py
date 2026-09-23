@@ -106,6 +106,7 @@ class RiskFinding(BaseModel):
     risk_level: RiskLevel
     risk_level_zh: str
     knowledge_references: List[Dict[str, Any]] = Field(default_factory=list)
+    knowledge_retrieval: Dict[str, Any] = Field(default_factory=dict)
     regulation_ids: List[str] = Field(default_factory=list)
     regulations: List[RegulationRef] = Field(default_factory=list)
     geometry: GeometryInfo = Field(default_factory=GeometryInfo)

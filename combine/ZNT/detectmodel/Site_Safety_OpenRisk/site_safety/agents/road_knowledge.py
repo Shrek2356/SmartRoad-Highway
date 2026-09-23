@@ -3,6 +3,7 @@ import hashlib
 import json
 import threading
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 from site_safety.agents.knowledge_base import KnowledgeBase
@@ -44,6 +45,15 @@ def attach_road_references(event, output_dir, kb=None):
         scope = {(reg.source_file, reg.clause) for reg in risk.regulations if reg.source_file}
         query = ' '.join([risk.risk_name_zh, risk.risk_description, *risk.visible_evidence])
         hits = kb.search(query, top_k=3, min_score=0, allowed_sections=scope, verified_only=True) if scope else []
+        risk.knowledge_retrieval = {
+            'query': query if scope else None,
+            'searched_at': datetime.now(timezone.utc).isoformat(timespec='seconds') if scope else None,
+            'method': 'curated_risk_scope_then_tfidf',
+            'status': ('matched' if hits else 'no_verified_match') if scope else 'not_configured',
+            'allowed_sections': [{'source_file': filename, 'section': section}
+                                 for filename, section in sorted(scope)],
+            'top_k': 3, 'min_score': 0, 'verified_only': True, 'hit_count': len(hits),
+        }
         for hit in hits:
             hit['retrieval_method'] = 'curated_risk_scope_then_tfidf'
             hit['usage'] = '待人工核查适用条件的处置参考；检索分数不是违法概率或风险置信度。'
@@ -58,7 +68,9 @@ def attach_road_references(event, output_dir, kb=None):
 def write_reference_report(event, output_dir):
     output_dir = Path(output_dir)
     references = {r.risk_id:r.knowledge_references for r in event.risks}
-    payload = {'scope': '处置参考，不构成违法认定，不改变视觉结论', 'references': references}
+    payload = {'schema_version': 2,
+               'scope': '处置参考，不构成违法认定，不改变视觉结论', 'references': references,
+               'retrievals': {r.risk_id: r.knowledge_retrieval for r in event.risks}}
     ref_file = output_dir / 'regulatory_references.json'
     ref_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
     report_json = output_dir / 'issue_report.json'
@@ -76,6 +88,11 @@ def write_reference_report(event, output_dir):
         lines = ['## 法规处置参考', '', payload['scope'] + '。未匹配条款时不生成法律依据。']
         for risk in event.risks:
             lines += ['', '### ' + risk.risk_name_zh]
+            trace = risk.knowledge_retrieval
+            if trace:
+                lines += ['检索时间：' + (trace.get('searched_at') or '未执行检索'),
+                          '检索词：' + (trace.get('query') or '未执行检索'),
+                          '检索方法：预设风险条款范围内的 TF-IDF 检索；仅引用来源校验通过的摘录。']
             if not risk.knowledge_references:
                 lines += ['暂无经过来源校验且在该风险检索范围内的条款。']
             for hit in risk.knowledge_references:
