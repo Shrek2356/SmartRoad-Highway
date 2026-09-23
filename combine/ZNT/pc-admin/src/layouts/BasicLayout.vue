@@ -7,7 +7,7 @@
         <SafetyCertificateOutlined class="brand-symbol" />
         <span v-if="!collapsed" class="logo-full">
           <span class="logo-title">路安智巡</span>
-          <span class="logo-team">SMARTROAD LAB</span>
+          <span class="logo-team">SMARTROAD-HIGHWAY</span>
         </span>
       </div>
       <a-menu
@@ -44,10 +44,7 @@
         </div>
         <div class="header-right">
           <ProductGuide />
-          <a-radio-group class="workspace-style-switch" :value="workspaceStyle" size="small" @change="e => setWorkspaceStyle(e.target.value)">
-            <a-radio-button value="professional">工作台</a-radio-button>
-            <a-radio-button value="showcase">展示视图</a-radio-button>
-          </a-radio-group>
+          <span class="industrial-label">HIGHWAY <i>/</i> 道路安全监测</span>
           <a-tooltip :title="colorTheme === 'dark' ? '切换明亮模式' : '切换暗色模式'">
             <a-button class="theme-toggle" shape="circle" :aria-label="colorTheme === 'dark' ? '切换明亮模式' : '切换暗色模式'" @click="toggleColorTheme">
               <BulbOutlined v-if="colorTheme === 'dark'" />

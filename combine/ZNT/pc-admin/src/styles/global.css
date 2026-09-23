@@ -6,6 +6,9 @@ html, body, #app {
   font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--bg); color:var(--text-primary); -webkit-font-smoothing:antialiased;
 }
+/* The workspace content owns scrolling; dialogs must not scroll the entire shell. */
+html, body, #app { overflow:clip; }
+.login-page { height:100vh; overflow-y:auto; }
 body { font-size:14px; line-height:1.65; }
 a { color:var(--link); }
 a:hover { color:var(--primary-strong); }

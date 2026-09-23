@@ -1,6 +1,6 @@
 /** Single palette for CSS, Ant Design and charts. Risk colors are not action colors. */
 const shared = {
-  'card-radius': '16px', 'product-ink': '#122c3a', 'media-bg': '#101d29',
+  'card-radius': '5px', 'product-ink': '#0a203c', 'media-bg': '#07182f',
   'hero-accent': '#88e0ca', 'hero-text': '#f1f8fb', 'hero-muted': '#b2c8d2',
 }
 export const palettes = {
@@ -21,17 +21,17 @@ export const palettes = {
   },
   dark: {
     ...shared,
-    bg: '#101b25', 'bg-2': '#152330', surface: '#192a37', 'surface-2': '#203341',
-    'surface-muted': '#243a49', 'border-color': '#324a5b',
-    'text-primary': '#e5eef4', 'text-secondary': '#b6c8d4', 'text-muted': '#a0b3c1',
-    primary: '#64d8c3', 'primary-strong': '#8de7d6', 'primary-soft': '#213f42',
-    'on-primary': '#092824', 'on-danger': '#3f0f18', link: '#79dfcd', danger: '#ff8391', warning: '#f5b86b',
+    bg: '#071426', 'bg-2': '#0b1c33', surface: '#0e223d', 'surface-2': '#122b48',
+    'surface-muted': '#193652', 'border-color': '#294862',
+    'text-primary': '#e4effb', 'text-secondary': '#b4cce1', 'text-muted': '#99b5cd',
+    primary: '#60d6f0', 'primary-strong': '#91e7fa', 'primary-soft': '#163c54',
+    'on-primary': '#062437', 'on-danger': '#3f0f18', link: '#79dff5', danger: '#ff8994', warning: '#f5be7a',
     caution: '#e8cf76', success: '#70d6ad', info: '#85bcef',
-    'sider-bg': '#13212d', 'sider-text': '#b6c8d4', 'sider-muted': '#94abba',
-    'sider-active': '#24423f', 'sider-trigger': '#13212d', 'sider-trigger-hover': '#203341',
+    'sider-bg': '#091a30', 'sider-text': '#b4cce1', 'sider-muted': '#99b5cd',
+    'sider-active': '#163c54', 'sider-trigger': '#091a30', 'sider-trigger-hover': '#122b48',
     'shadow-card': '0 2px 4px #00000008, 0 8px 28px #00000008',
     'shadow-float': '0 16px 48px #00000035',
-    'chart-1': '#64d8c3', 'chart-2': '#85bcef', 'chart-3': '#d4b47b',
+    'chart-1': '#60d6f0', 'chart-2': '#85bcef', 'chart-3': '#d4b47b',
     'chart-4': '#bca2e6', 'chart-5': '#e69aae',
   },
 }
@@ -48,7 +48,7 @@ export function antTokens(mode) {
     colorBgLayout: p.bg, colorFillAlter: p['surface-2'], colorBorder: p['border-color'], colorBorderSecondary: p['border-color'],
     colorText: p['text-primary'], colorTextBase: p['text-primary'], colorTextSecondary: p['text-secondary'],
     colorTextTertiary: p['text-muted'], colorTextQuaternary: p['text-muted'],
-    colorTextLightSolid: '#ffffff', colorBgSpotlight: '#122c3a', borderRadius: 8, borderRadiusLG: 16,
+    colorTextLightSolid: '#ffffff', colorBgSpotlight: '#0a203c', borderRadius: 4, borderRadiusLG: 5,
     fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
     fontSize: 14, controlHeight: 36, boxShadowSecondary: p['shadow-float'],
   }

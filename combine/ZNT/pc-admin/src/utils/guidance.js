@@ -1,8 +1,8 @@
 // Shared by navigation, search and contextual help. Keep destinations in-app;
 // visiting an entry must never start inference or alter a user's configuration.
 export const HELP_PAGES = [
-  { path:'/dashboard', title:'工作总览', group:'工作台', description:'看清当前项目、风险与待办，再决定今天的第一步。', keywords:'首页 驾驶舱 统计 数据',
-    steps:['在左上角确认当前项目。','查看风险、待整改工单及数据来源标记。','点击指标进入明细，或新建图片检测。'], result:'项目风险概况和对应的处置入口。', caution:'“预置展示素材”用于演示，不等于现场实时事件。', next:'/realtime-detect' },
+  { path:'/dashboard', title:'公路空间总览', group:'工作台', description:'旋转三维道路模型，查看演示设备与路况报告。', keywords:'首页 驾驶舱 三维 3D 乐西 地图 设备 报告 数据',
+    steps:['拖动旋转、滚轮缩放，或使用俯视和全线斜视按钮。','点击设备或路况点位，在右侧查看详情；可按等级筛选或开关图层。','导出演示报告；使用“新建真实检测”进入实际图像分析。'], result:'乐西高速空间示意、虚构设备台账与演示路况报告。', caution:'模型、桩号和点位均为演示构造，不是测绘成果或现场事件，不进入真实档案与统计。', next:'/realtime-detect' },
   { path:'/monitor', title:'视频监控', group:'工作台', description:'查看摄像头画面，管理实时初筛与定期全图巡检。', keywords:'摄像头 YOLO RTSP 视频 监测',
     steps:['在基础资源管理中登记设备及流地址。','选择摄像头；预览地址与检测用 RTSP 地址可以不同。','启用实时监测，并按需要配置 30 分钟或 2 小时的全面检测。'], result:'监测任务和送往视觉模型的候选帧。', caution:'窗口不能直接播放 RTSP。预览需 MP4/WebM 或受支持的 FLV 地址；检测服务可单独读取 RTSP。', next:'/task-center' },
   { path:'/realtime-detect', title:'图片与截帧检测', group:'工作台', description:'从一张图片开始，获取风险说明、位置和处理建议。', keywords:'上传 图片 异常 Qwen 云端 API 检测',

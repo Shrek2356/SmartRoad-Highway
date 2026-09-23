@@ -36,7 +36,7 @@ const routes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/dashboard/RoadLab.vue'),
+        component: () => import('@/views/dashboard/HighwayOverview.vue'),
         meta: { title: '首页工作台', icon: 'DashboardOutlined', roles: [] },
       },
       {
@@ -125,7 +125,7 @@ const router = createRouter({
 
 /** 全局守卫：登录校验 + 角色权限 */
 router.beforeEach((to, _from, next) => {
-  document.title = `${to.meta.title || '道路安全'} · 路安智巡 SmartRoad-Inspection`
+  document.title = `${to.meta.title || '道路安全'} · 路安智巡 SmartRoad-Highway`
 
   if (to.meta.public) {
     next()

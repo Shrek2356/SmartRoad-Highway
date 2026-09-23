@@ -3,6 +3,7 @@
 面向高速公路建设与管理的道路风险检测实验室原型。当前版本 **1.4.5**，通过 Qwen 观察与复核、SAM3 多概念定位、道路法规检索和带图问题报告，把图像中的风险线索转为可追溯、可人工复核的管理记录。当前重点验证服务器端分析，端侧实时模型暂缓训练。
 
 - [项目介绍与测试分析](docs/PROJECT_INTRO_ANALYSIS.md)
+- [深蓝工业工作台与乐西高速三维概况](docs/HIGHWAY_OVERVIEW.md)：可旋转模型、设备点位和路况报告；数据为明确标注的虚构演示。
 - [下载完整带图报告 HTML](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html) · [报告与原始附件 ZIP](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-bundle-20260922.zip)
 - [下载 1.4.5 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.4.5)
 - [1.4.5 安装、升级及档案保留验证](docs/validation/v1.4.5/README.md)
@@ -66,7 +67,7 @@ flowchart LR
 | [SmartRoad-Inspection](https://github.com/Shrek2356/SmartRoad-Inspection) | 2026-09-13 建立的旧迁移仓库；核对时远端仍是早期基线 `4740ff3`，保留作历史追溯。 |
 | `SmartRoad-Inspection.exe`、同名安装目录 | 当前 1.4.5 软件沿用的程序与安装名称，承载的已是新版道路流程；不是另一套模型。 |
 
-两个 GitHub 仓库均为私有。`Inspection` 是“巡检、检测”的意思；仓库名称和软件安装名称属于不同层次。
+`SmartRoad-Highway` 已按项目所有者要求公开，便于分享给老师。`Inspection` 是“巡检、检测”的意思；仓库名称和软件安装名称属于不同层次。
 
 ## 源码开发
 
