@@ -1,0 +1,16 @@
+{
+  "version": "1.5.0",
+  "total_tests": 196,
+  "frontend_tests": 47,
+  "backend_tests": 104,
+  "desktop_tests": 45,
+  "real_models_executed": false,
+  "native_window_tested": false,
+  "package_ok": true,
+  "installed_ok": true,
+  "archived_jobs": 15,
+  "archive_evidence_files": 1405,
+  "protected_files": 1437,
+  "history_http_links": 94,
+  "installer_sha256": "FA01351D802590E0ACB8A3D19296C83DCC66D067A7225E72BC353D6B2EE5BC76"
+}

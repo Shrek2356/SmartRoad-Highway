@@ -705,6 +705,7 @@ class TrainingFreeInspector:
         screening_trigger: ScreeningTrigger | Dict[str, Any] | str | Path | None = None,
         screening_mask_path: str | Path | None = None,
         progress_callback=None,
+        learning_context=None,
     ) -> InspectionResult:
         def progress(stage, status, detail=""):
             if progress_callback is not None:
@@ -934,6 +935,9 @@ class TrainingFreeInspector:
         road_v5 = road_v4 and self.config['pipeline'].get('road_concept_segmentation', False)
         locked_road_plans = {}
         if road_v4:
+            if learning_context is not None:
+                from site_safety.pipeline.case_memory import recheck_with_memory
+                first_payload = recheck_with_memory(self.mllm, image_path, output_dir, first_payload, candidate_risks, learning_context)
             first_payload = compile_observations(first_payload, candidate_risks, concept_mode=road_v5)
             if first_payload["candidate_assessments"]:
                 plan_prompt = planning_prompt(first_payload["candidate_assessments"])

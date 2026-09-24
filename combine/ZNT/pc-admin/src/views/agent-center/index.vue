@@ -1,8 +1,9 @@
 <template>
   <div class="page-card">
     <div class="page-title">Agent 协同与学习中心</div>
-    <a-alert type="info" show-icon message="这里承接模型不确定结果的人工裁决、复盘学习建议、通知与道路风险提示；所有操作写入业务数据库。" />
+    <a-alert type="info" show-icon message="这里承接人工复核、案例经验、版本回放、复盘建议和道路风险提示；审核与版本操作均留痕保存。" />
     <a-tabs v-model:activeKey="tab" style="margin-top: 14px">
+      <a-tab-pane key="continuous" tab="持续改进与回归"><ContinuousLearning v-if="tab === 'continuous'" /></a-tab-pane>
       <a-tab-pane key="review" tab="人工复核">
         <a-table :columns="reviewColumns" :data-source="confirmations" row-key="request_id" :loading="loading">
           <template #bodyCell="{ column, record }">
@@ -58,12 +59,13 @@ import { useRouteTab } from '@/composables/useRouteTab'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import { saveFile } from '@/utils/saveFile'
+import ContinuousLearning from '@/components/ContinuousLearning.vue'
 import { decideConfirmation, decideProposal, fetchBriefing, fetchConfirmations, fetchNotifications, fetchOverrides, fetchProposals } from '@/api/agentCenter'
 
 const store = useUserStore()
 const isAdmin = computed(() => store.role === 'admin')
 const canReview = computed(() => ['admin', 'safety'].includes(store.role))
-const tab = useRouteTab(['review','learning','briefing','system'], 'review'), loading = ref(false)
+const tab = useRouteTab(['continuous','review','learning','briefing','system'], 'continuous'), loading = ref(false)
 const confirmations = ref([]), proposals = ref([]), overrides = ref({}), notifications = ref([]), briefing = ref('')
 const reviewOpen = ref(false), reviewTarget = ref(null), reviewVerdict = ref('confirmed'), reviewComment = ref('')
 const reviewColumns = [{ title: '风险', dataIndex: 'risk_name_zh', key: 'risk_name_zh' }, { title: '模型疑问/判断', dataIndex: 'model_judgment', key: 'model_judgment' }, { title: '转人工原因', dataIndex: 'reason', key: 'reason' }, { title: '置信度', key: 'confidence', width: 100 }, { title: '状态', key: 'status', width: 100 }, { title: '操作', key: 'action', width: 180 }]

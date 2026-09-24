@@ -214,6 +214,7 @@
               <span v-if="job.mock" class="job-meta-note">演示</span>
             </div>
             <a-alert v-if="job?.source === 'archive'" type="info" show-icon :message="`历史检测档案 · ${job.archive?.sample_id || ''}`" description="原图、掩码和报告来自此前检测，已归档留存；本次查看不重新检测，不生成现场告警或工单。" />
+            <a-alert v-if="job?.source === 'learning_evaluation'" type="info" show-icon message="经验版本评测回放" description="此任务用于当前版与候选版对照；证据留存，不生成现场告警、工单或通知。" />
             <a-alert v-if="job?.error" type="error" :message="job.error" show-icon class="job-error" />
           </div>
 
@@ -232,6 +233,9 @@
                 message="画面可判断范围" :description="job.result.assessment_quality.issues.join('；')" />
               <p v-if="job.result.issue_report"><a :href="job.result.issue_report" target="_blank" rel="noopener">查看自动问题报告与证据记录</a></p>
               <a-button class="reference-button" @click="referencesOpen = true">规范参考记录 · {{ referenceCount(job.result) }} 条关联引用</a-button>
+              <a-button v-if="job.status === 'done' && job.profile !== 'demo' && job.source !== 'learning_evaluation' && !job.mock && ['admin','safety'].includes(user.role)" @click="correctionOpen = true">纠错与补标</a-button>
+              <p v-if="job.result.case_memory">案例经验：{{ job.result.case_memory.version_id === 'none' ? '未启用经验版本' : job.result.case_memory.version_id }} · {{ ({ applied:'已辅助复查', no_match:'未检索到相关案例', disabled:'原始检测流程', unavailable:'经验已暂停', error:'参考失败，使用原始观察' })[job.result.case_memory.status] }}<br v-if="job.result.case_memory.detail" />{{ job.result.case_memory.detail || '' }}</p>
+              <a-collapse v-if="job.result.case_memory?.references?.length"><a-collapse-panel key="case-memory" header="本次引用的人工案例"><p v-for="entry in job.result.case_memory.references" :key="entry.case_id">{{ entry.case_id }} · 文本相关性 {{ entry.score }}<br />{{ entry.reason }}</p></a-collapse-panel></a-collapse>
               <div v-if="job.result.screening" class="screening-summary">
                 <a-tag :color="job.result.screening.triggered ? 'orange' : 'default'">
                   YOLO {{ job.result.screening.triggered ? '已触发' : '未触发' }}
@@ -330,6 +334,7 @@
     </a-row>
 
     <RegulatoryReferenceDialog v-model:open="referencesOpen" :job="job" />
+    <CorrectionDialog v-model:open="correctionOpen" :job-id="job?.job_id" />
     <a-modal v-model:open="codeOpen" title="算法源码与启动" :footer="null" width="680px">
       <p>目录：<code class="path">detectmodel/Site_Safety_OpenRisk/</code></p>
       <pre class="code">cd detectmodel/Site_Safety_OpenRisk
@@ -367,6 +372,8 @@ import { syncDetectJobToWorkOrders } from '@/utils/detectWorkOrders'
 import { syncDetectJobToResults } from '@/utils/detectResults'
 import { referenceCount } from '@/utils/regulatoryReferences'
 import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
+import CorrectionDialog from '@/components/CorrectionDialog.vue'
+const correctionOpen = ref(false)
 
 const route = useRoute()
 const user = useUserStore()

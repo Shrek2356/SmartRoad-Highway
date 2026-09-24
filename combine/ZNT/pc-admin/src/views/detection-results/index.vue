@@ -77,6 +77,7 @@
                   @click="preview(c.images.original)"
                 >查看原图</a-button>
                 <a-button v-if="c.detectJobId && !c.presentationAsset" type="link" @click="referenceJobId = c.detectJobId; referencesOpen = true">规范参考</a-button>
+                <a-button v-if="c.detectJobId && !c.presentationAsset && ['admin','safety'].includes(user.role)" type="link" @click="correctionJob = c.detectJobId; correctionOpen = true">纠错与补标</a-button>
               </div>
             </div>
           </div>
@@ -88,6 +89,7 @@
     </div>
 
     <RegulatoryReferenceDialog v-model:open="referencesOpen" :job-id="referenceJobId" />
+    <CorrectionDialog v-model:open="correctionOpen" :job-id="correctionJob" />
     <a-modal v-model:open="originOpen" title="结果由来" width="720px" :footer="null">
       <p class="origin-summary">{{ origin.summary }}</p>
       <div class="flow">
@@ -125,6 +127,10 @@ import { message } from 'ant-design-vue'
 import { fetchDetectionResults } from '@/api/detectionResults'
 import { subscribeModules } from '@/utils/moduleBus'
 import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
+import CorrectionDialog from '@/components/CorrectionDialog.vue'
+import { useUserStore } from '@/stores/user'
+const user = useUserStore()
+const correctionOpen = ref(false), correctionJob = ref('')
 
 const route = useRoute()
 const router = useRouter()

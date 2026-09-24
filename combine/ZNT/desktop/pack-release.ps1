@@ -1,6 +1,6 @@
 param(
     [string]$Destination = 'E:\work\智慧交通\软件包',
-    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.4.7_road'
+    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.5.0_road'
 )
 $ErrorActionPreference = 'Stop'
 $appSource = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -51,7 +51,7 @@ Copy-Tree 'detectmodel\Site_Safety_OpenRisk'
 Copy-Tree 'desktop'
 Copy-Tree 'requirements'
 Copy-Tree 'docs'
-foreach ($guide in @('DETECTION_HISTORY.md','HIGHWAY_OVERVIEW.md','INK_LIGHT_THEME.md','READING_AND_ZOOM.md','RAG_REFERENCE_RECORDS.md')) {
+foreach ($guide in @('DETECTION_HISTORY.md','HIGHWAY_OVERVIEW.md','INK_LIGHT_THEME.md','READING_AND_ZOOM.md','RAG_REFERENCE_RECORDS.md','CONTINUOUS_LEARNING.md')) {
     Copy-Item -LiteralPath (Join-Path $appSource "..\..\docs\$guide") -Destination (Join-Path $releaseRoot "docs\$guide")
 }
 Copy-Item -LiteralPath (Join-Path $appSource '..\..\docs\images') -Destination (Join-Path $releaseRoot 'docs\images') -Recurse

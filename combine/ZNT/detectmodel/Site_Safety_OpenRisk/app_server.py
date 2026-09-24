@@ -252,6 +252,8 @@ class AppState:
         self.notification_retry_stop = threading.Event()
         self.loop: Optional[asyncio.AbstractEventLoop] = None
         self.detect_api = os.environ.get("ZNT_DETECT_API", "http://127.0.0.1:8910").rstrip("/")
+        from learning_service import LearningService
+        self.continuous_learning = LearningService(ROOT, app_data, self.detect_api)
         self.media_roots = [ROOT / "outputs", ROOT / "results", ROOT / "eval_data", ROOT / "sample_data",
                             app_data, ROOT.parent.parent / "example"]
 
@@ -913,6 +915,7 @@ async def lifespan(_: FastAPI):
         yield
     finally:
         if STATE is not None:
+            STATE.continuous_learning.stop.set()
             STATE.notification_retry_stop.set()
             STATE.shutdown_stream_workers()
             STATE.loop = None
@@ -951,6 +954,10 @@ def auth_officer(authorization: Optional[str] = Header(None)) -> dict:
 
 def auth_admin(authorization: Optional[str] = Header(None)) -> dict:
     return _check_role(authorization, "admin")
+
+
+from learning_service import install_routes as install_learning_routes
+install_learning_routes(app, lambda: STATE, auth_viewer, auth_officer, auth_admin)
 
 
 @app.post("/api/auth/login")

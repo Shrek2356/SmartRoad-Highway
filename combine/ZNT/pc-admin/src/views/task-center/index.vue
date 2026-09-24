@@ -21,6 +21,7 @@
           <a-space>
             <a-button size="small" @click="router.push({ path:'/realtime-detect', query:{ job: record.job_id } })">过程与结果</a-button>
             <a-button v-if="record.status === 'done'" size="small" @click="referenceJobId = record.job_id; referencesOpen = true">规范参考</a-button>
+            <a-button v-if="canOperate && record.status === 'done' && record.profile !== 'demo'" size="small" @click="correctionJob = record.job_id; correctionOpen = true">纠错与补标</a-button>
             <a-button v-if="canOperate && record.status === 'done' && !record.archived" size="small" :loading="busy === record.job_id" @click="retain(record)">归档留存</a-button>
             <a-button v-if="canOperate && record.status === 'queued'" size="small" danger :loading="busy === record.job_id" @click="act(record, false)">取消排队</a-button>
             <a-popconfirm v-if="canOperate && ['error','cancelled'].includes(record.status)" title="将重新推理并生成新任务，是否继续？" @confirm="act(record, true)"><a-button size="small" :loading="busy === record.job_id">重新检测</a-button></a-popconfirm>
@@ -31,6 +32,7 @@
     </a-table>
     <a-space style="margin-top:16px"><a-button :disabled="page === 0 || loading" @click="page--; load()">上一页</a-button><span>第 {{ page + 1 }} 页</span><a-button :disabled="items.length < pageSize || loading" @click="page++; load()">下一页</a-button></a-space>
     <RegulatoryReferenceDialog v-model:open="referencesOpen" :job-id="referenceJobId" />
+    <CorrectionDialog v-model:open="correctionOpen" :job-id="correctionJob" />
   </div>
 </template>
 <script setup>
@@ -40,6 +42,8 @@ import { popupContainer } from '@/utils/displayPreferences'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
 import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
+import CorrectionDialog from '@/components/CorrectionDialog.vue'
+const correctionOpen = ref(false), correctionJob = ref('')
 import { fetchTaskPage, cancelDetectJob, retryDetectJob, importDetectionArchive, archiveDetectJob } from '@/api/detect'
 const router = useRouter(), user = useUserStore()
 const items = ref([]), status = ref(''), error = ref(''), loading = ref(false), busy = ref(''), page = ref(0)

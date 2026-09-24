@@ -256,6 +256,7 @@ class DetectBridge:
         force_inspection: bool = False,
         force_full_audit: bool = False,
         audit_interval_minutes: Optional[int] = None,
+        learning_evaluation: Optional[Dict[str, Any]] = None,
     ) -> dict:
         # ``data_mode`` describes the acquisition channel, not the model profile.
         # Older demo clients sent "demo", which is not valid for DetectionEvent.
@@ -333,6 +334,30 @@ class DetectBridge:
             "routed_to_vlm": None,
             "clip_enabled": clip_enabled,
         }
+        if profile_id != "demo":
+            from site_safety.agents.continuous_learning import LearningStore, runtime_fingerprint
+            memory_root = Path(os.getenv("ZNT_LEARNING_DIR", str(ROOT / "road_app_data/continuous_learning")))
+            memory = LearningStore(memory_root)
+            active = memory.active()
+            version_id = learning_evaluation["version_id"] if learning_evaluation else active["version_id"]
+            context = {"root": str(memory_root), "version_id": version_id,
+                       "group_key": learning_evaluation["group_key"] if learning_evaluation else device_id + ":" + job["created_at"][:10]}
+            try:
+                context["snapshot"] = memory.snapshot(version_id)
+                fingerprint = runtime_fingerprint(ROOT, profile_id)
+                if learning_evaluation:
+                    if fingerprint != learning_evaluation["fingerprint"]:
+                        raise ValueError("回放配置已经变化")
+                    job["learning_fingerprint"] = fingerprint
+                    job["learning_evaluation"] = learning_evaluation
+                    job["archived"] = True  # Keep replay evidence with its evaluation record.
+                elif version_id != "none" and fingerprint != active.get("fingerprint"):
+                    raise ValueError("运行配置与已验证版本不一致，经验已暂停；请重新回放")
+            except (ValueError, OSError, KeyError) as exc:
+                if learning_evaluation:
+                    raise HTTPException(409, str(exc)) from exc
+                context["error"] = str(exc)
+            job["learning_context"] = context
         with self.lock:
             self.jobs[job_id] = job
         self._persist_job(job)
@@ -386,6 +411,15 @@ class DetectBridge:
                 result['reference_record_status'] = 'recorded'
             except (OSError, ValueError, TypeError):
                 result['reference_record_status'] = 'invalid'
+        memory_record = self.jobs_root / job_id / 'case_memory_references.json'
+        if memory_record.is_file():
+            try:
+                memory = json.loads(memory_record.read_text(encoding='utf-8'))
+                if not isinstance(memory, dict) or not isinstance(memory.get('references'), list) or not isinstance(memory.get('version_id'), str):
+                    raise ValueError('Invalid case memory snapshot')
+                result['case_memory'] = memory
+            except (OSError, ValueError, TypeError):
+                result['case_memory'] = {'version_id': 'unknown', 'status': 'error', 'references': [], 'detail': '历史案例引用记录损坏，请核查原始证据'}
         return {**job, 'result': result}
 
     def recent(self, limit: int = 20, offset: int = 0, status: str = "", archived_only: bool = False) -> list:
@@ -398,7 +432,7 @@ class DetectBridge:
                 by_id[summary.parent.name] = json.loads(summary.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-        items = [j for j in by_id.values() if (not status or j.get("status") == status)
+        items = [j for j in by_id.values() if j.get("source") != "learning_evaluation" and (not status or j.get("status") == status)
                  and (not archived_only or j.get("archived"))]
         items.sort(key=lambda x: x.get("created_at", ""), reverse=True)
         return [
@@ -454,6 +488,8 @@ class DetectBridge:
 
     def retry_job(self, job_id: str) -> dict:
         job = self.get_job(job_id)
+        if job.get("source") == "learning_evaluation":
+            raise HTTPException(409, "评测任务请在持续改进中心重新发起整组回放")
         if job["status"] not in {"error", "cancelled"}:
             raise HTTPException(409, "仅失败或取消的任务支持重试；重试将产生新任务")
         image = self.media_path(job_id, job["image_name"])
@@ -776,6 +812,13 @@ class DetectBridge:
                 config.setdefault("pipeline", {})["threshold_overrides_path"] = (
                     "configs/road_threshold_overrides.json"
                 )
+            if job.get("learning_evaluation"):
+                from site_safety.agents.continuous_learning import LearningStore
+                run = LearningStore(job["learning_context"]["root"]).get("runs", job["learning_evaluation"]["run_id"])
+                if run["status"] != "running" or run.get("cancel_requested"):
+                    raise ValueError("回放已停止，不恢复过期评测任务")
+                if config.get("mllm", {}).get("backend") != "openai_compatible" or config.get("sam3", {}).get("backend") != "bridge":
+                    raise ValueError("真实回放禁止使用模拟视觉或模拟分割适配器")
 
             self._mark_before(job, "screen")
             screening_started = time.perf_counter()
@@ -821,6 +864,10 @@ class DetectBridge:
             include_mask_overlay = bool(screening_views.get("include_mask_overlay", True))
             pipeline_started = time.perf_counter()
             with self.inference_lock:
+                if job.get("learning_evaluation"):
+                    from site_safety.agents.continuous_learning import runtime_fingerprint
+                    if runtime_fingerprint(ROOT, job["profile"]) != job["learning_fingerprint"]:
+                        raise ValueError("回放开始前模型或配置变化")
                 result = inspector.inspect(
                     image_path,
                     out_dir,
@@ -829,6 +876,7 @@ class DetectBridge:
                     if coarse_mask.is_file() and include_mask_overlay
                     else None,
                     progress_callback=lambda stage, status, detail="": self._set_stage(job, stage, status, detail),
+                    **({"learning_context": job["learning_context"]} if "learning_context" in job else {}),
                 )
             job["timings_ms"]["vlm_sam_pipeline"] = round(
                 (time.perf_counter() - pipeline_started) * 1000, 1
@@ -852,11 +900,14 @@ class DetectBridge:
             self._mark_done(job, "report", "处置建议已生成")
 
             job["result"] = summary
-            if job.get("profile") == "demo":
+            memory_trace = out_dir / "case_memory_references.json"
+            if memory_trace.is_file():
+                summary["case_memory"] = json.loads(memory_trace.read_text(encoding="utf-8"))
+            if job.get("profile") == "demo" or job.get("source") == "learning_evaluation":
                 business_sync = {
                     "ok": False,
                     "skipped": True,
-                    "detail": "demo_profile_not_persisted",
+                    "detail": "evaluation_not_persisted" if job.get("source") == "learning_evaluation" else "demo_profile_not_persisted",
                 }
             else:
                 business_sync = self._push_business_event(event_payload, job_id=job_id)
@@ -1115,6 +1166,34 @@ def create_app(bridge: DetectBridge) -> FastAPI:
     @app.get("/api/detect/health")
     def health() -> dict:
         return bridge.health()
+
+    @app.post("/api/detect/learning-replay")
+    def learning_replay(payload: dict) -> dict:
+        from site_safety.agents.continuous_learning import LearningStore, runtime_fingerprint
+        import secrets
+        memory = LearningStore(Path(os.getenv("ZNT_LEARNING_DIR", str(ROOT / "road_app_data/continuous_learning"))))
+        try:
+            run = memory.get("runs", payload.get("run_id"))
+            if not secrets.compare_digest(str(payload.get("token", "")), run["token"]):
+                raise HTTPException(403, "回放凭据无效")
+            if run["status"] != "running" or run.get("cancel_requested") or payload.get("arm") not in {"baseline", "candidate"}:
+                raise ValueError("回放状态无效")
+            case = next((c for c in run["cases"] if c["case_id"] == payload.get("case_id")), None)
+            if case is None or case["partition"] == "train" or run["profile"] not in {"standard", "offline"}:
+                raise ValueError("回放案例或真实模型档位无效")
+            memory.snapshot_valid(case)
+            version = memory.snapshot(run[payload["arm"]])
+            if any(c["image_sha256"] == case["image_sha256"] or c["group_key"] == case["group_key"] for c in version["cases"]):
+                raise ValueError("训练与评测数据交叉")
+            if runtime_fingerprint(ROOT, run["profile"]) != run["fingerprint"]:
+                raise ValueError("回放模型配置变化")
+            image = memory.image(case)
+            return bridge.create_job(source="learning_evaluation", device_id="REPLAY", data_mode="offline",
+                image_bytes=image.read_bytes(), filename=image.name, profile=run["profile"], force_full_audit=True,
+                learning_evaluation=dict(version_id=version["version_id"], group_key=case["group_key"],
+                                         fingerprint=run["fingerprint"], run_id=run["run_id"], case_id=case["case_id"], arm=payload["arm"]))
+        except (ValueError, KeyError, OSError) as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     @app.get("/api/detect/deployment")
     def get_deployment_guide() -> dict:

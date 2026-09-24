@@ -28,7 +28,7 @@ class GatewayMixin:
     def _dispatch(self):
         route = urlsplit(self.path).path
         if route == "/desktop-api/health":
-            self._json(200, {"ok": True, "service": "sitesafe-desktop", "version": "1.4.7"})
+            self._json(200, {"ok": True, "service": "sitesafe-desktop", "version": "1.5.0"})
             return True
         for prefix, port in self.proxy_routes.items():
             if route == prefix or route.startswith(prefix + "/"):
