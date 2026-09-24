@@ -237,6 +237,7 @@ function rewriteMediaUrls(result) {
     issue_report: fix(result.issue_report),
     regulatory_references: fix(result.regulatory_references),
     scene_annotation: fix(result.scene_annotation),
+    scene_layers: (result.scene_layers || []).map(layer => ({ ...layer, mask: fix(layer.mask) })),
     overlays: (result.overlays || []).map(fix),
     masks: (result.masks || []).map(fix),
     crops: (result.crops || []).map(fix),

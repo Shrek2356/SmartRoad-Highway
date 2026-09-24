@@ -1,6 +1,6 @@
 param(
     [string]$Destination = 'E:\work\智慧交通\软件包',
-    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.5.0_road'
+    [string]$Name = 'SmartRoad-Inspection_Desktop_v1.5.1_road'
 )
 $ErrorActionPreference = 'Stop'
 $appSource = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))

@@ -4,7 +4,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 
 from site_safety.schemas import SAM3Task
 from site_safety.utils.image import mask_box, save_binary_mask, image_font
@@ -69,6 +69,10 @@ def write_scene_annotation(image, output_dir, report, by_task, context_tasks):
             mask=np.maximum(mask,(item.mask>0).astype(np.uint8))
         name=f'scene_mask_{concept}.png';save_binary_mask(mask,output_dir/name)
         color=(28,175,83) if concept=='road' and normal else (44,127,208)
+        if concept=='road':
+            tint=Image.new('RGB',image.size,color)
+            overlay=Image.composite(tint,overlay,Image.fromarray((mask*64).astype(np.uint8)))
+            draw=ImageDraw.Draw(overlay)
         text={'road':'路面：未见可见异常' if normal else '道路区域（场景对象）',
               'traffic_sign':'路牌（场景对象）','guardrail':'护栏（场景对象）'}[concept]
         # A single road union box avoids labeling every asphalt patch as a new road.
@@ -87,7 +91,7 @@ def write_scene_annotation(image, output_dir, report, by_task, context_tasks):
         records.append(dict(concept=concept,mask_path=name,instances=len(items),boxes=boxes,
                             color='green' if concept=='road' and normal else 'blue',is_risk=False,
                             displayed_in_overview=concept!='guardrail'))
-    banner='未见可见异常 · 绿色为道路框' if normal else '蓝色为场景对象 · 风险见逐项叠加图'
+    banner='未见可见异常 · 绿色为道路掩码与框' if normal else '蓝色为场景对象 · 风险见逐项叠加图'
     draw.rectangle((0,0,image.width,31),fill=(20,35,52));draw.text((8,4),banner,fill='white',font=font)
     overlay.save(output_dir/'scene_annotation.png')
     metadata=dict(result_status=report.assessment_quality.get('result_status'),

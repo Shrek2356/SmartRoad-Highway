@@ -10,6 +10,19 @@ from site_safety.pipeline.road_evidence import reconcile_road_findings
 from site_safety.schemas import FirstPassResponse,SecondPassResponse,FinalRisk,RiskEvidence,SegmentationRecord
 
 CAT=[{'risk_id':'water_accumulation','name_zh':'积水'},{'risk_id':'road_debris','name_zh':'散落物'}]
+
+def test_normal_scene_fills_only_segmented_pixels(tmp_path):
+    from types import SimpleNamespace
+    mask=np.zeros((180,200),dtype=np.uint8)
+    mask[80:170,20:180]=1
+    mask[100:150,70:130]=0
+    report=SimpleNamespace(assessment_quality={'result_status':'no_visible_anomaly'})
+    write_scene_annotation(Image.new('RGB',(200,180)),tmp_path,report,
+        {'context_road':[SimpleNamespace(mask=mask)]},[SimpleNamespace(task_id='context_road')])
+    rendered=np.array(Image.open(tmp_path/'scene_annotation.png'))
+    assert rendered[130,40,1]>0
+    assert not rendered[130,100].any()  # Hole stays unfilled: not a rectangle mask.
+    assert np.array_equal(np.array(Image.open(tmp_path/'scene_mask_road.png'))>0,mask>0)
 def payload(state='wet_only',water=None):
     return compile_observations(dict(scene_summary='道路',visibility='adequate',road_surface_state=state,
         water_evidence=water or [],scene_elements=['road'], observations=[dict(risk_id='water_accumulation',

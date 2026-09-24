@@ -392,6 +392,17 @@ class DetectBridge:
         if not isinstance(job.get('result'), dict):
             return job
         result = dict(job['result'])
+        result['scene_layers'] = []
+        scene_record = self.jobs_root / job_id / 'scene_annotation.json'
+        if scene_record.is_file():
+            try:
+                scene = json.loads(scene_record.read_text(encoding='utf-8'))
+                for item in scene.get('items', []):
+                    name = Path(item.get('mask_path') or '').name
+                    if name and (scene_record.parent / name).is_file():
+                        result['scene_layers'].append({**item, 'mask': self._media_url(job_id, name)})
+            except (OSError, ValueError, TypeError, AttributeError):
+                result['scene_layers'] = []
         record = self.jobs_root / job_id / 'regulatory_references.json'
         result['regulatory_references'] = None
         result['reference_record_status'] = 'unavailable'

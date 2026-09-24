@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 5, 0, 0),
-    prodvers=(1, 5, 0, 0),
+    filevers=(1, 5, 1, 0),
+    prodvers=(1, 5, 1, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -16,12 +16,12 @@ VSVersionInfo(
         [
           StringStruct(u'CompanyName', u'SmartRoad-Inspection Project Team'),
           StringStruct(u'FileDescription', u'SmartRoad-Inspection 道路风险检测实验室原型'),
-          StringStruct(u'FileVersion', u'1.5.0'),
+          StringStruct(u'FileVersion', u'1.5.1'),
           StringStruct(u'InternalName', u'SmartRoad-Inspection'),
           StringStruct(u'LegalCopyright', u'Copyright (C) 2026. All rights reserved.'),
           StringStruct(u'OriginalFilename', u'SmartRoad-Inspection.exe'),
           StringStruct(u'ProductName', u'SmartRoad-Inspection 道路风险检测实验室原型'),
-          StringStruct(u'ProductVersion', u'1.5.0')
+          StringStruct(u'ProductVersion', u'1.5.1')
         ]
       )
     ]),

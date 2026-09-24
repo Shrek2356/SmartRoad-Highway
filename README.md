@@ -2,9 +2,9 @@
 
 面向高速公路建设与管理的道路风险检测实验室原型，集道路概况、摄像头查看、图像风险分析、带图报告和历史档案于一体。系统通过 Qwen 观察与复核、SAM3 多概念定位及道路法规检索，把图像中的风险线索转为可追溯、可人工复核的管理记录。当前重点验证服务器端分析，端侧实时模型暂缓训练。
 
-[下载 Windows 安装包 v1.5.0](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.5.0/SmartRoad-Inspection_Setup_v1.5.0_x64.exe) · [安装与验证](docs/validation/v1.5.0/README.md) · [项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html)
+[下载 Windows 安装包 v1.5.1](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.5.1/SmartRoad-Inspection_Setup_v1.5.1_x64.exe) · [安装与验证](docs/validation/v1.5.1/README.md) · [项目与测试分析](docs/PROJECT_INTRO_ANALYSIS.md) · [应用使用说明](combine/ZNT/README.md) · [带图分析报告下载](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html)
 
-> **版本说明：** 最新安装包 **v1.5.0** 已包含下方展示的深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大，图像检测的规范参考记录，以及纠错、人工案例经验和真实模型配对回放功能，可直接下载安装。基础包自带界面与服务运行时；真实检测所需模型权重及 GPU 环境另行配置。项目仍处于实验室小试阶段。
+> **版本说明：** 最新安装包 **v1.5.1** 已包含下方展示的深蓝／水墨主题、三维概况、摄像头联动、字号与画面放大，图像检测的规范参考记录，以及纠错、人工案例经验和真实模型配对回放功能，可直接下载安装。基础包自带界面与服务运行时；真实检测所需模型权重及 GPU 环境另行配置。项目仍处于实验室小试阶段。
 
 ## 应用能做什么
 
@@ -73,6 +73,10 @@
 
 候选版本先对独立样本进行真实模型配对回放，比较误报、漏报和范围框定位，再由管理员启用；可回退原始检测流程。默认无已批准经验，不自动训练模型，不把工作流测试当作精度提升。[查看完整使用说明](docs/CONTINUOUS_LEARNING.md)。
 
+### 路面掩码分层显示（v1.5.1）
+
+检测结果支持正常路面绿色半透明掩码、异常独立图层、框与掩码切换及透明度调节。历史档案直接读取已存掩码；缺失掩码不伪造定位结果。
+
 ## 快速体验与资料
 
 1. 打开软件进入首页，查看演示概况，展开三维模型并选择设备或路况点位。
@@ -81,7 +85,7 @@
 4. 查看已有带图报告与历史档案；运行新的真实检测前，按部署说明配置模型及服务。
 
 - [完整带图报告 HTML](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-report.html) · [报告与原始附件 ZIP](https://github.com/Shrek2356/SmartRoad-Highway/releases/download/v1.4.4/road-v5-analysis-bundle-20260922.zip)
-- [v1.5.0 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.5.0) · [安装与档案保留验证](docs/validation/v1.5.0/README.md)
+- [v1.5.1 安装包及可导入历史档案](https://github.com/Shrek2356/SmartRoad-Highway/releases/tag/v1.5.1) · [安装与档案保留验证](docs/validation/v1.5.1/README.md)
 - [检测历史与原图归档](docs/DETECTION_HISTORY.md)：历史原图、标注、掩码及报告导入与长期留存。
 - [环境部署说明](combine/ZNT/requirements/README.md) · [v1.4.4 模型测试与验证摘要](docs/validation/v1.4.4/README.md)
 - [道路领域迁移检查](combine/ZNT/docs/道路领域全面迁移检查_20260921.md)

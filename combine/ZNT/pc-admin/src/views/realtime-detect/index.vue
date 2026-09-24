@@ -267,7 +267,8 @@
                   <img class="result-img" :src="job.result.input_image" alt="input" />
                 </a-col>
                 <a-col :span="16">
-                  <div class="img-label">场景与风险标注（绿色道路框：未见可见异常；蓝色：场景对象）</div>
+                  <div class="img-label">场景与风险标注</div>
+                  <DetectionLayers v-if="job.result.scene_layers?.length || job.result.risks?.some(r => r.mask)" :result="job.result" />
                   <div class="overlay-grid">
                     <img v-if="job.result.scene_annotation" class="result-img"
                       :src="job.result.scene_annotation" alt="道路及路牌场景标注"
@@ -373,6 +374,7 @@ import { syncDetectJobToResults } from '@/utils/detectResults'
 import { referenceCount } from '@/utils/regulatoryReferences'
 import RegulatoryReferenceDialog from '@/components/RegulatoryReferenceDialog.vue'
 import CorrectionDialog from '@/components/CorrectionDialog.vue'
+import DetectionLayers from '@/components/DetectionLayers.vue'
 const correctionOpen = ref(false)
 
 const route = useRoute()
